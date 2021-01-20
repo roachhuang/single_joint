@@ -1,0 +1,4 @@
+---
+float32 pos       # res: position
+float32 vel
+bool success

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+    
+  <rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+  <!-- <rosparam file="$(find diff_drive)/config/joint_limits.yaml" command="load"/> -->
+   
+  <arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
+  <arg name="gui" default="true" />
+  
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+  
+  <node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
+  
+  <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> 
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+  </node>
+  
+  <node name="rviz" pkg="rviz" type="rviz"/>
+    
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="
+        	/single_joint_actuator/joints_update
+          /single_joint_actuator/joint1_position_controller
+        "/>
+</launch>
+
+ 

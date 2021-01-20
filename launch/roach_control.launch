@@ -1,0 +1,27 @@
+<launch>
+    <rosparam file="$(find diff_drive)/config/roach_controllers.yaml" command="load"/>
+    <!-- <rosparam file="$(find diff_drive)/config/roach_joint_limits.yaml" command="load"/> -->
+   
+    <node name="MyRobotHardwareInterface" pkg="diff_drive" type="roach_HW_interface.cpp" output="screen"/>
+        
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/ >
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="
+            /MyRobot/joints_update
+            /MyRobot/JointA_EffortController
+            /MyRobot/JointB_EffortController
+            /MyRobot/JointC_PositionController
+        "/>
+    </launch>
+
+    <!-- 
+    roslaunch diff_drive check_position_controller.launch
+    rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0
+    rostopic pub /single_joint_actuator/joint1_position_controller/command std_msgs/Float64 "data: 1.57"
+    rosrun rqt_plot rqt_plot
+    rosrun rqt_reconfigure rqt_reconfigure
+
+    // rospy_tutorials is a pkg already installed by default, you can check it by:
+    roscd rospy_tutorials
+-->

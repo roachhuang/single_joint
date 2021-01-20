@@ -1,0 +1,18 @@
+#1st line is the namespace of the controller
+single_joint_actuator:  
+    # Publish all joint states -----------------------------------
+    joints_update:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
+    
+    # Position Controllers ---------------------------------------
+    joint1_position_controller:
+      type: effort_controllers/JointPositionController
+      joint: joint1
+      pid: {p: 30.0, i: 0.03, d: 0.0}
+      
+    # Velocity Controllers ---------------------------------------
+    joint1_velocity_controller:
+      type: effort_controllers/JointVelocityController
+      joint: joint1
+      pid: {p: 13.0, i: 0.48, d: 0.0}

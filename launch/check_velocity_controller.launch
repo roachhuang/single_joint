@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+    
+  <rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+  <!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
+   
+  <arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
+  <arg name="gui" default="true" />
+  
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
+  <param name="use_gui" value="$(arg gui)"/>
+  
+  <node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
+  
+  <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> 
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  
+  <node name="rviz" pkg="rviz" type="rviz"/>
+    
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="
+        	/single_joint_actuator/joints_update
+          /single_joint_actuator/joint1_velocity_controller
+        "/>
+</launch>
+
+<!--
+   note that we cannot run position controller and velocity controller at the same time, so we create two launch files.
+    roslaunch diff_drive check_velocity_controller.launch
+    rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0
+    rostopic pub /single_joint_actuator/joint1_velocity_controller/command std_msgs/Float64 "data: 0.57"
+    rosrun rqt_reconfigure rqt_reconfigure
+    rosrun rqt_plot rqt_plot
+
+  rostopic pub /single_joint_actuator/joint1_velocity_controller/command std_msgs/Float64 "data: 0.6"
+-->
