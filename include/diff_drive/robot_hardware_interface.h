@@ -1,3 +1,4 @@
+// this is to prevent from being included more than once.
 #ifndef robot_hardware_interface_h
 #define robot_hardware_interface_h
 
