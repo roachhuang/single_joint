@@ -28,3 +28,8 @@
     # rostopic pub /jointservo sensor_msgs/JointState '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ""}, name: ["art1"], position: [150.0], velocity: [0.0], effort: [0.0]}' --once
     rostopic pub /joint_states_from_arduion sensor_msgs/JointState '{position: [30], velocity: [40]}' --once
 
+
+ history | grep roslaunch
+ history <number>
+ # run previous cmd again
+ !<number>
