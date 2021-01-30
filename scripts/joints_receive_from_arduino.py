@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #encoding: utf8
-import sys, rospy
+import rospy
 # from rospy_tutorials.msg import Floats
 # from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import JointState
@@ -28,12 +28,16 @@ def my_server(req):
     res.success = True
     return res
 
-rospy.init_node('subscriber_py', anonymous=True) #initialzing the node with name "subscriber_py"
+def main():
+    rospy.init_node('subscriber_py', anonymous=True) #initialzing the node with name "subscriber_py"
 
-rospy.Subscriber("/joint_states_from_arduino", JointState, my_callback, queue_size=10)
+    rospy.Subscriber("/joint_states_from_arduino", JointState, my_callback, queue_size=10)
  
-# joint_state is the file name of srv; client is read method in h/w interface
-rospy.Service('read_joint_state', joint_state, my_server)
-rospy.loginfo('joint state service is available for h/w interface')
+    # joint_state is the file name of srv; client is read method in h/w interface
+    rospy.Service('read_joint_state', joint_state, my_server)
+    rospy.loginfo('joint state service is available for h/w interface')
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin() 
 
-rospy.spin() 
+if __name__ == '__main__':
+    main()
