@@ -2,7 +2,7 @@
 #encoding: utf8
 import rospy
 from rospy_tutorials.msg import Floats
-# from std_msgs.msg import Float32MultiArray
+
 # from sensor_msgs.msg import JointState
 # <packagename>.srv
 from diff_drive.srv import joint_state, joint_stateResponse

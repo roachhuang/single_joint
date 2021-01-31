@@ -13,17 +13,18 @@
 const float N = 806;
 ros::NodeHandle  nh;
 
-double output = 0;
+double vr = 0, vl = 0;
 volatile int encoderPos = 0;
 float temp = 0;
 rospy_tutorials::Floats actuator_state;
 // sensor_msgs::JointState joint_state;
 
 void set_angle_cb( const rospy_tutorials::Floats& cmd_msg) { 
-  output = cmd_msg.data[0];
+  vr = cmd_msg.data[0];
+  vl = cmd_msg.data[1];
 }
 
-ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino", set_angle_cb);
+ros::Subscriber<rospy_tutorials::Floats> sub("/efforts", set_angle_cb);
 // ros::Publisher pub("joint_states_from_arduino", &joint_state);
 ros::Publisher pub("/joint_states_from_arduino", &actuator_state);
 // volatile float pos[1] = {0}, vel[1] = {0};
@@ -64,7 +65,7 @@ void loop() {
   // pos[0] = (float)(encoderPos * 0.4467); // in degrees
   // now = millis();
 
-  pwmOut(constrain(output, -249, 249));
+  pwmOut(constrain(vr, -249, 249));
   // Serial.println(pos[0]);
 
   // sprintf(buffer, "degree： %d", encoderPos);

@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<launch>
-    
+<launch> 
   <rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
   <!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
    
@@ -16,11 +15,21 @@
     <param name="baud" value="57600"/>
   </node>
 
+<!--
+roslaunch turtlebot_teleop keyboard_teleop.launch
+  rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+roslaunch robotican_lizi lizi.launch gazebo:=true
+-->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
   <node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
   
   <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> 
-
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="cmd_vel_py" pkg="diff_drive" type="handle_cmd_vel.py" output="screen">
+    <rosparam>
+    wheel_separation: 0.2 
+    wheel_radius: 0.035
+    </rosparam>    
+  </node>  
   
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find diff_drive)/rviz/single_joint.rviz" />
     
@@ -29,6 +38,8 @@
         	/single_joint_actuator/joints_update
           /single_joint_actuator/joint1_velocity_controller
         "/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 </launch>
 
 <!--
