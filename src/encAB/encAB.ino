@@ -13,18 +13,17 @@
 const float N = 806;
 ros::NodeHandle  nh;
 
-double vr = 0, vl = 0;
+double output = 0;
 volatile int encoderPos = 0;
 float temp = 0;
 rospy_tutorials::Floats actuator_state;
 // sensor_msgs::JointState joint_state;
 
 void set_angle_cb( const rospy_tutorials::Floats& cmd_msg) { 
-  vr = cmd_msg.data[0];
-  vl = cmd_msg.data[1];
+  output = cmd_msg.data[0];
 }
 
-ros::Subscriber<rospy_tutorials::Floats> sub("/efforts", set_angle_cb);
+ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino", set_angle_cb);
 // ros::Publisher pub("joint_states_from_arduino", &joint_state);
 ros::Publisher pub("/joint_states_from_arduino", &actuator_state);
 // volatile float pos[1] = {0}, vel[1] = {0};
@@ -41,8 +40,8 @@ void setup() {
   pinMode(encoderPinA1, INPUT_PULLUP);                  // quadrature encoder input A
   pinMode(encoderPinB1, INPUT_PULLUP);                  // quadrature encoder input B
   //initialize Pin States
-  digitalWrite(encoderPinA1, LOW);
-  digitalWrite(encoderPinB1, LOW);
+  // digitalWrite(encoderPinA1, LOW);
+  // digitalWrite(encoderPinB1, LOW);
   pinMode(EnA, OUTPUT);
   pinMode(In1, OUTPUT);
   pinMode(In2, OUTPUT);
@@ -52,8 +51,8 @@ void setup() {
   Timer1.attachInterrupt(ISR_timerone);
   // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
 
-  //digitalWrite(In1, HIGH);
-  //digitalWrite(In2, LOW);
+  digitalWrite(In1, HIGH);
+  digitalWrite(In2, LOW);
   // analogWrite(EnA, 80);  // left
 
   // joint_state.position_length = 1;
@@ -65,7 +64,7 @@ void loop() {
   // pos[0] = (float)(encoderPos * 0.4467); // in degrees
   // now = millis();
 
-  pwmOut(constrain(vr, -249, 249));
+  pwmOut(constrain(output, -249, 249));
   // Serial.println(pos[0]);
 
   // sprintf(buffer, "degree： %d", encoderPos);
