@@ -22,6 +22,9 @@ import roslib
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist 
 
+# mapping -1, 1 (m/s) to -200, 200
+from numpy import interp
+
 #############################################################
 #############################################################
 class TwistToMotors():
@@ -75,9 +78,12 @@ class TwistToMotors():
         self.right = 1.0 * self.dx + self.dr * self.w / 2 
         self.left = 1.0 * self.dx - self.dr * self.w / 2
         # rospy.loginfo("publishing: (%d, %d)", left, right)
-                
-        self.pub_lmotor.publish(self.left)
-        self.pub_rmotor.publish(self.right)
+        
+        self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
+        self.left_mapped = interp(self.left, [-1, 1], [-200, 200])
+
+        self.pub_lmotor.publish(self.left_mapped)
+        self.pub_rmotor.publish(self.right_mapped)
             
         self.ticks_since_target += 1
 

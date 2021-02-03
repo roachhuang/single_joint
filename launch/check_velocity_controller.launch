@@ -24,7 +24,7 @@ roslaunch robotican_lizi lizi.launch gazebo:=true
 	<node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
 
 	<node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/>
-	<node name="cmd_vel_py" pkg="diff_drive" type="handle_cmd_vel.py" output="screen">
+	<node name="twist_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen">
 		<rosparam>
 			wheel_separation: 0.2
 			wheel_radius: 0.035
