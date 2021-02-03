@@ -28,7 +28,7 @@ from numpy import interp
 
 #############################################################
 #############################################################
-class TwistToMotors():
+class TwistToMotors(object):
 #############################################################
 #############################################################
 
@@ -77,12 +77,13 @@ class TwistToMotors():
         # dx = (l + r) / 2
         # dr = (r - l) / w
          
-        self.right = 1.0 * self.dx + self.dr * self.w / 2 
-        self.left = 1.0 * self.dx - self.dr * self.w / 2
+        self.right = 1.0 * self.dx + self.dr * self.L / 2 
+        self.left = 1.0 * self.dx - self.dr * self.L / 2
         rospy.loginfo("publishing: (%d, %d)", self.left, self.right)
-        
-        self.self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
-        self.v[1] = interp(self.left, [-1, 1], [-200, 200])
+
+        # mapping makes tunning pid coefficents easier
+        self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
+        # self.v[1] = interp(self.left, [-1, 1], [-200, 200])
 
         #self.pub_lmotor.publish(self.left_mapped)
         self.pub_rmotor.publish(self.right_mapped)
