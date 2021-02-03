@@ -1,45 +1,47 @@
 <?xml version="1.0"?>
-<launch> 
-  <rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
-  <!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
-   
-  <arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
-  <arg name="gui" default="true" />
-  
-  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
-  <param name="use_gui" value="$(arg gui)"/>
-  
-  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
-    <param name="port" value="/dev/ttyUSB0"/>
-    <param name="baud" value="57600"/>
-  </node>
+<launch>
+	<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+	<!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
 
-<!--
+	<arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
+	<arg name="gui" default="true" />
+
+	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
+	<param name="use_gui" value="$(arg gui)"/>
+
+	<node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+	<node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+		<param name="port" value="/dev/ttyUSB0"/>
+		<param name="baud" value="57600"/>
+	</node>
+
+	<!--
 roslaunch turtlebot_teleop keyboard_teleop.launch
   rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 roslaunch robotican_lizi lizi.launch gazebo:=true
 -->
-  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
-  <node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
-  
-  <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> 
-  <node name="cmd_vel_py" pkg="diff_drive" type="handle_cmd_vel.py" output="screen">
-    <rosparam>
-    wheel_separation: 0.2 
-    wheel_radius: 0.035
-    </rosparam>    
-  </node>  
-  
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find diff_drive)/rviz/single_joint.rviz" />
-    
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-        args="
+	<node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+	<node name="robot_hardware_interface" pkg="diff_drive" type="single_joint_hardware_interface" output="screen"/>
+
+	<node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/>
+	<node name="cmd_vel_py" pkg="diff_drive" type="handle_cmd_vel.py" output="screen">
+		<rosparam>
+			wheel_separation: 0.2
+			wheel_radius: 0.035
+		</rosparam>
+	</node>
+
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find diff_drive)/rviz/single_joint.rviz" />
+
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+		  args="
         	/single_joint_actuator/joints_update
-          /single_joint_actuator/joint1_velocity_controller
+            /single_joint_actuator/joint1_velocity_controller
         "/>
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
 </launch>
 
 <!--
