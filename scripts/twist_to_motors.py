@@ -18,8 +18,9 @@
 """
 
 import rospy
-import roslib
+# import roslib
 from std_msgs.msg import Float64
+# from rospy_tutorials.msg import Floats
 from geometry_msgs.msg import Twist 
 
 # mapping -1, 1 (m/s) to -200, 200
@@ -43,13 +44,14 @@ class TwistToMotors():
         # 20ms
         self.rate = rospy.get_param("rate", 50)        
     
-        self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float32, queue_size=10)
+        # self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float64, queue_size=10)
         self.pub_rmotor = rospy.Publisher('/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
-        rospy.Subscriber('twist', Twist, self.twistCallback)    
+        # rospy.Subscriber('twist', Twist, self.twistCallback)
+        rospy.Subscriber('/cmd_vel', Twist, self.twistCallback)        
           
         self.timeout_ticks = rospy.get_param("~timeout_ticks", 2)
-        self.left = 0
-        self.right = 0
+        self.left = self.left_mapped = 0
+        self.right = self.right_mapped = 0
         
     #############################################################
     def spin(self):
@@ -74,15 +76,15 @@ class TwistToMotors():
     
         # dx = (l + r) / 2
         # dr = (r - l) / w
-            
+         
         self.right = 1.0 * self.dx + self.dr * self.w / 2 
         self.left = 1.0 * self.dx - self.dr * self.w / 2
-        # rospy.loginfo("publishing: (%d, %d)", left, right)
+        rospy.loginfo("publishing: (%d, %d)", self.left, self.right)
         
-        self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
-        self.left_mapped = interp(self.left, [-1, 1], [-200, 200])
+        self.self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
+        self.v[1] = interp(self.left, [-1, 1], [-200, 200])
 
-        self.pub_lmotor.publish(self.left_mapped)
+        #self.pub_lmotor.publish(self.left_mapped)
         self.pub_rmotor.publish(self.right_mapped)
             
         self.ticks_since_target += 1
