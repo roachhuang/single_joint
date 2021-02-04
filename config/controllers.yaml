@@ -1,7 +1,7 @@
-#1st line is the namespace of the controller
-single_joint_actuator:  
+#1st line is the namespace of the controller, may be can get rid of it later for simplicity
+mbot:  
     # Publish all joint states -----------------------------------
-    joints_update:
+    joint_state_controller:
       type: joint_state_controller/JointStateController
       publish_rate: 50
     
@@ -17,7 +17,14 @@ single_joint_actuator:
       joint: joint1
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
       pid: {p: 6, i: 12, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
-      #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
+      #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}'
+
+    # left joint
+    joint2_velocity_controller:
+      type: effort_controllers/JointVelocityController
+      joint: joint2
+      # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
+      pid: {p: 6, i: 12, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
     wheel_separation : 0.2
     wheel_radius : 0.035    

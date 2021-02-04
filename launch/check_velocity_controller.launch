@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <launch>
+	<!-- Load joint controller configurations from YAML file to parameter server -->
 	<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
 	<!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
 
 	<arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
 	<arg name="gui" default="true" />
 
+	<!-- Load the URDF into the ROS Parameter Server -->
 	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
 	<param name="use_gui" value="$(arg gui)"/>
 
@@ -31,14 +33,20 @@ roslaunch robotican_lizi lizi.launch gazebo:=true
 
 	</node>
 
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find diff_drive)/rviz/single_joint.rviz" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find diff_drive)/rviz/single_joint.rviz" required="true"/>
 
-	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+	<!-- convert joint states to TF transforms for rviz, etc -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+		respawn="false" output="screen">
+		<remap from="/joint_states" to="/mbot/joint_states" />
+	</node>
 
+	<!-- plz refer to yaml file -->
 	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-		  args="
-        	/single_joint_actuator/joints_update
-            /single_joint_actuator/joint1_velocity_controller
+		  ns="/mbot" args="			
+        	joints_update
+            joint1_velocity_controller
+			joint2_velocity_controller
         "/>
 
 

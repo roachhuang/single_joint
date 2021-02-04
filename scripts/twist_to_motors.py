@@ -23,7 +23,7 @@ from std_msgs.msg import Float64
 # from rospy_tutorials.msg import Floats
 from geometry_msgs.msg import Twist 
 
-# mapping -1, 1 (m/s) to -200, 200
+# this is used to map -1, 1 (m/s) to -200, 200
 from numpy import interp
 
 #############################################################
@@ -43,10 +43,15 @@ class TwistToMotors(object):
         self.R = rospy.get_param("wheel_radius", 0.035)
         # 20ms
         self.rate = rospy.get_param("rate", 50)        
-    
-        # self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float64, queue_size=10)
-        self.pub_rmotor = rospy.Publisher('/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
+        
+        # the topic is specified in check_velocity_controller.launch
+        # mbot is name space of in yaml controller file
+        self.pub_lmotor = rospy.Publisher('/mbot/joint1_velocity_controller/command', Float64, queue_size=10)
+        # left joint
+        self.pub_rmotor = rospy.Publisher('/mbot/joint2_velocity_controller/command', Float64, queue_size=10)
+
         # rospy.Subscriber('twist', Twist, self.twistCallback)
+        # rqt_robot_steering publishes cmd_vel instead of twist
         rospy.Subscriber('/cmd_vel', Twist, self.twistCallback)        
           
         self.timeout_ticks = rospy.get_param("~timeout_ticks", 2)
@@ -83,9 +88,9 @@ class TwistToMotors(object):
 
         # mapping makes tunning pid coefficents easier
         self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
-        # self.v[1] = interp(self.left, [-1, 1], [-200, 200])
+        self.left_mapped = interp(self.left, [-1, 1], [-200, 200])
 
-        #self.pub_lmotor.publish(self.left_mapped)
+        self.pub_lmotor.publish(self.left_mapped)
         self.pub_rmotor.publish(self.right_mapped)
             
         self.ticks_since_target += 1
