@@ -20,13 +20,6 @@ public:
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
 		// E.g. parse the URDF for joint names & interfaces, then initialize them
-
-		pub = n.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-		client = n.serviceClient<diff_drive::joint_state>("/read_joint_state");
-	}
-
-	// if not working, move init into construct and delete init func.
-	bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh) {
 		/* Create a JointStateHandle for each joint and register them with the JointStateInterface.
 		** connect and register the joint state interface
 		*/
@@ -53,8 +46,17 @@ public:
 		// Register the JointEffortInterface containing the read/write joints
 		// with this robot's hardware_interface::RobotHW.
 		registerInterface(&effort_joint_interface);
+
+		pub = n.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+		client = n.serviceClient<diff_drive::joint_state>("/read_joint_state");
+	}
+
+	/* if not working, move init into construct and delete init func.
+	bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh) {
+
 		return true;
 	}
+	*/
 
 	void read(const ros::Time& time, const ros::Duration& period) {
 		if (client.call(joint_read))
@@ -114,5 +116,11 @@ private:
 	rospy_tutorials::Floats joints_pub;
 	diff_drive::joint_state joint_read;
 };
+
+/* also the read method can be put here
+void MyRobot::read() {
+
+}
+*/
 
 #endif
