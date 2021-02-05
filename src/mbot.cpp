@@ -25,7 +25,7 @@ ros:AsyncSpinner spinner(1);
 	while (ros::ok())
 	{
 		// Basic bookkeeping to get the system time in order to compute the control period.
-		const ros::Time     time = ros:Time::now();
+		const ros::Time time = ros:Time::now();
 		const ros::Duration period = time - prev_time;
 
 		// Execution of the actual control loop.

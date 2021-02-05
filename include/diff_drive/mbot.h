@@ -6,6 +6,8 @@
 #include <hardware_interface/robot_hw.h>
 
 #include <ros/ros.h>
+// #include <controller_manager/controller_manager.h>
+
 #include <rospy_tutorials/Floats.h>
 // #include <sensor_msgs/JointState.h>
 #include <diff_drive/joint_state.h>
@@ -18,11 +20,12 @@ public:
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
 		// E.g. parse the URDF for joint names & interfaces, then initialize them
-		init();
-		ros::Publisher pub = n.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+
+		pub = n.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
 		client = n.serviceClient<diff_drive::joint_state>("/read_joint_state");
 	}
 
+	// if not working, move init into construct and delete init func.
 	bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh) {
 		/* Create a JointStateHandle for each joint and register them with the JointStateInterface.
 		** connect and register the joint state interface
@@ -71,7 +74,6 @@ public:
 			pos[1] = 0;
 			vel[1] = 0;
 		}
-
 	}
 
 	void write(const ros::Time& time, const ros::Duration& period) {
@@ -86,10 +88,6 @@ public:
 		ROS_INFO("PWM Cmd: %.2f", cmd[0]);
 		pub.publish(joints_pub);
 	}
-	ros::Publisher pub;
-	ros::ServiceClient client;
-	rospy_tutorials::Floats joints_pub;
-	diff_drive::joint_state joint_read;
 
 private:
 	// hardware_interface::JointStateInterface gives read access to all joint values 
@@ -107,7 +105,14 @@ private:
 	double vel[2];
 	double eff[2];
 
+	// no namespace
 	ros::NodeHandle n;
+
+	ros::Publisher pub;
+	ros::ServiceClient client;
+
+	rospy_tutorials::Floats joints_pub;
+	diff_drive::joint_state joint_read;
 };
 
 #endif
