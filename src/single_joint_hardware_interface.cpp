@@ -17,6 +17,43 @@ ROBOTHardwareInterface::~ROBOTHardwareInterface() {
 }
 
 void ROBOTHardwareInterface::init() {
+// Initialization of the robot's resources (joints, sensors, actuators) and
+		// interfaces can be done here or inside init().
+		// E.g. parse the URDF for joint names & interfaces, then initialize them
+		/* Create a JointStateHandle for each joint and register them with the JointStateInterface.
+		** connect and register the joint state interface
+		*/
+		hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
+		joint_state_interface_.registerHandle(state_handle_a);
+
+		// left joint
+		//hardware_interface::JointStateHandle state_handle_b("join2", &pos[1], &vel[1], &eff[1]);
+		//joint_state_interface_.registerHandle(state_handle_b);
+
+		// Register the JointStateInterface containing the read only joints
+		// with this robot's hardware_interface::RobotHW.
+		registerInterface(&joint_state_interface_);
+
+		// connect and register the joint position interface
+		// Create a JointHandle (read and write) for each controllable joint
+		// using the read-only joint handles within the JointStateInterface and 
+		// register them with the JointEffortInterface.
+		hardware_interface::JointHandle effort_handle_a(joint_state_interface_.getHandle("joint1"), &cmd[0]);
+        effort_joint_interface_.registerHandle(effort_handle_a);
+
+		//hardware_interface::JointHandle effort_handle_b(joint_state_interface_.getHandle("joint2"), &cmd[1]);
+		//effort_joint_interface_.registerHandle(effort_handle_b);
+
+		// Register the JointEffortInterface containing the read/write joints
+		// with this robot's hardware_interface::RobotHW.
+		registerInterface(&effort_joint_interface_);
+
+		//pub = n.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+		//client = n.serviceClient<diff_drive::joint_state>("/read_joint_state");
+}
+
+/*
+void ROBOTHardwareInterface::init() {
     
     
 	joint_name_="joint1";
@@ -44,7 +81,7 @@ void ROBOTHardwareInterface::init() {
 	// joint_limits_interface::EffortJointSaturationHandle jointLimitsHandle(jointEffortHandle, limits);
 	// effortJointSaturationInterface.registerHandle(jointLimitsHandle);
 	
-/*
+-----------
 If you have more joints then,
     joint_name_= "joint2"
     
@@ -67,7 +104,7 @@ If you have more joints then,
 	effortJointSaturationInterface.registerHandle(jointLimitsHandle2);
 	
 	Repeat same for other joints
-*/
+----------------
 	
 
 // Register all joints interfaces    
@@ -76,6 +113,7 @@ If you have more joints then,
     registerInterface(&effort_joint_interface_);
     // registerInterface(&effortJointSaturationInterface);
 }
+*/
 
 void ROBOTHardwareInterface::update(const ros::TimerEvent& e) {
     elapsed_time_ = ros::Duration(e.current_real - e.last_real);
