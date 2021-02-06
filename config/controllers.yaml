@@ -1,10 +1,10 @@
 #1st line is the namespace of the controller
-single_joint_actuator:  
+single_joint_actuator: 
     # Publish all joint states -----------------------------------
     joints_update:
       type: joint_state_controller/JointStateController
       publish_rate: 50
-    
+   
     # Position Controllers ---------------------------------------
     joint1_position_controller:
       type: effort_controllers/JointPositionController
@@ -28,4 +28,3 @@ single_joint_actuator:
 
     wheel_separation : 0.2
     wheel_radius : 0.035
-    

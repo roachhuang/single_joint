@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <launch>
-	<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+	
 	<!-- <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/> -->
 
 	<arg name="model" default="$(find diff_drive)/urdf/single_joint_actuator.urdf.xacro"/>
 	<arg name="gui" default="true" />
 
-	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
+	<param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
 	<param name="use_gui" value="$(arg gui)"/>
 
 	<rosparam param="wheel_separation">0.2</rosparam>
@@ -35,12 +35,14 @@ roslaunch robotican_lizi lizi.launch gazebo:=true
 
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
-	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+	<group>
+		<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+		<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
 		  args="
-        	/single_joint_actuator/joints_update
-            /single_joint_actuator/joint1_velocity_controller
+        	single_joint_actuator/joints_update
+            single_joint_actuator/joint1_velocity_controller
         "/>
-
+	</group>
 
 </launch>
 
