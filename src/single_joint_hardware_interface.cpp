@@ -22,7 +22,7 @@ void ROBOTHardwareInterface::init() {
 	joint_name_="joint1";
     
 // Create joint state interface
-    hardware_interface::JointStateHandle jointStateHandle(joint_name_, &joint_position_, &joint_velocity_, &joint_effort_);
+    hardware_interface::JointStateHandle jointStateHandle(joint_name_, &pos[0], &vel[0], &eff[0]);
     joint_state_interface_.registerHandle(jointStateHandle);
 
 // Create position joint interface
@@ -34,7 +34,7 @@ void ROBOTHardwareInterface::init() {
     //effort_joint_interface_.registerHandle(jointVelocityHandle);
     
 // Create effort joint interface
-    hardware_interface::JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_);
+    hardware_interface::JointHandle jointEffortHandle(jointStateHandle, &cmd[0]);
 	effort_joint_interface_.registerHandle(jointEffortHandle);
 	
 // Create Joint Limit interface   
@@ -90,9 +90,9 @@ void ROBOTHardwareInterface::read() {
 	
 	if(client.call(joint_read))
 	{
-	    joint_position_ = angles::from_degrees(joint_read.response.pos);
-	    joint_velocity_ = angles::from_degrees(joint_read.response.vel);
-	    ROS_INFO("Current Pos: %.2f, Vel: %.2f",joint_position_,joint_velocity_);
+	    pos[0] = angles::from_degrees(joint_read.response.pos);
+	    vel[0] = angles::from_degrees(joint_read.response.vel);
+	    ROS_INFO("Current Pos: %.2f, Vel: %.2f",pos[0], vel[0]);
 /*
 if more than one joint,
         get values for joint_position_2, joint_velocity_2,......
@@ -101,8 +101,8 @@ if more than one joint,
 	}
 	else
 	{
-	    joint_position_ = 0;
-	    joint_velocity_ = 0;
+	    pos[0] = 0;
+	    vel[0] = 0;
 	}
         
 
@@ -112,14 +112,14 @@ void ROBOTHardwareInterface::write(ros::Duration elapsed_time) {
    
     // effortJointSaturationInterface.enforceLimits(elapsed_time);    
 	joints_pub.data.clear();
-	joints_pub.data.push_back(joint_effort_command_);
+	joints_pub.data.push_back(cmd[0]);
 	
 /*
 if more than one joint,
     publish values for joint_effort_command_2,......
 */	
 	
-	ROS_INFO("PWM Cmd: %.2f",joint_effort_command_);
+	ROS_INFO("PWM Cmd: %.2f", cmd[0]);
 	pub.publish(joints_pub);
 		
 }
@@ -128,7 +128,8 @@ if more than one joint,
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "single_joint_hardware_interface");
+    // ros::init(argc, argv, "single_joint_hardware_interface");
+    ros::init(argc, argv, "roachbot_hardware_interface");
     ros::NodeHandle nh;
     //ros::AsyncSpinner spinner(4);  
     ros::MultiThreadedSpinner spinner(2); // Multiple threads for controller service callback and for the Service client callback used to get the feedback from ardiuno

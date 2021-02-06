@@ -45,13 +45,24 @@ class ROBOTHardwareInterface : public hardware_interface::RobotHW
         //joint_limits_interface::PositionJointSaturationInterface positionJointSaturationInterface;
                 
         int num_joints_;
-        std::string joint_name_;  
+        std::string joint_name_; 
+		/* 
         double joint_position_;
         double joint_velocity_;
         double joint_effort_;
         double joint_position_command_;
         double joint_effort_command_;
         double joint_velocity_command_;
+		*/
+	
+		// Data member array to store the controller commands which are sent to the 
+		// robot's resources (joints, actuators)
+		double cmd[2];
+
+		// Data member arrays to store the state of the robot's resources (joints, sensors)
+		double pos[2];
+		double vel[2];
+		double eff[2];
         
         ros::NodeHandle nh_;
         ros::Timer non_realtime_loop_;
