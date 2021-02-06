@@ -79,7 +79,7 @@ class TwistToMotors(object):
          
         self.right = 1.0 * self.dx + self.dr * self.L / 2 
         self.left = 1.0 * self.dx - self.dr * self.L / 2
-        rospy.loginfo("publishing: (%d, %d)", self.left, self.right)
+        #rospy.loginfo("publishing: (%d, %d)", self.left, self.right)
 
         # mapping makes tunning pid coefficents easier
         self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
