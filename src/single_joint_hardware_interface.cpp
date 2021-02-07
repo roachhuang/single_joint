@@ -27,8 +27,8 @@ void ROBOTHardwareInterface::init() {
 		joint_state_interface_.registerHandle(state_handle_a);
 
 		// left joint
-		//hardware_interface::JointStateHandle state_handle_b("join2", &pos[1], &vel[1], &eff[1]);
-		//joint_state_interface_.registerHandle(state_handle_b);
+		hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
+		joint_state_interface_.registerHandle(state_handle_b);
 
 		// Register the JointStateInterface containing the read only joints
 		// with this robot's hardware_interface::RobotHW.
@@ -41,8 +41,8 @@ void ROBOTHardwareInterface::init() {
 		hardware_interface::JointHandle effort_handle_a(joint_state_interface_.getHandle("joint1"), &cmd[0]);
         effort_joint_interface_.registerHandle(effort_handle_a);
 
-		//hardware_interface::JointHandle effort_handle_b(joint_state_interface_.getHandle("joint2"), &cmd[1]);
-		//effort_joint_interface_.registerHandle(effort_handle_b);
+		hardware_interface::JointHandle effort_handle_b(joint_state_interface_.getHandle("joint2"), &cmd[1]);
+		effort_joint_interface_.registerHandle(effort_handle_b);
 
 		// Register the JointEffortInterface containing the read/write joints
 		// with this robot's hardware_interface::RobotHW.
