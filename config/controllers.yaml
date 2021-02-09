@@ -19,7 +19,7 @@ single_joint_actuator:
       pid: {p: 1.1, i: 0.00162, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
       #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
-    joint2_velocity_controller:
+    lwheel:
       type: effort_controllers/JointVelocityController
       joint: joint2
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s

@@ -32,6 +32,7 @@
 		  args="
         	single_joint_actuator/joints_update
             single_joint_actuator/joint1_velocity_controller
+			single_joint_actuator/lwheel
         "/>
 	</group>
 </launch>
