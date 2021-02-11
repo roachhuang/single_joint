@@ -13,7 +13,7 @@
 
 	<include file="$(find diff_drive)/launch/view_robot.launch" />
 	
-	<rosparam param="wheel_separation">0.2</rosparam>
+	<rosparam param="wheel_separation">0.15</rosparam>
 	<rosparam param="wheel_radius">0.035</rosparam>
 	
 	<node pkg="rosserial_python" type="serial_node.py" name="serial_node">

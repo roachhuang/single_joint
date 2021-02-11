@@ -29,6 +29,8 @@ from numpy import interp
 
 #############################################################
 #############################################################
+
+
 class TwistToMotors(object):
 #############################################################
 #############################################################
@@ -43,16 +45,17 @@ class TwistToMotors(object):
         # what func to call when ctrl-c is pressed
         rospy.on_shutdown(self.shutdown)
 
-        self.L = rospy.get_param("wheel_separation", 0.2)
+        self.L = rospy.get_param("wheel_separation", 0.15)
         self.R = rospy.get_param("wheel_radius", 0.035)
         # 20ms
         self.rate = rospy.get_param("rate", 50)
 
         # self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float64, queue_size=10)
         # pub to h/w interface. the topic name must match with yaml and launch files.
-        self.pub_rmotor = rospy.Publisher(            
+        self.pub_rmotor = rospy.Publisher(
             '/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
-        self.pub_lmotor = rospy.Publisher('/single_joint_actuator/lwheel/command', Float64, queue_size=10)
+        self.pub_lmotor = rospy.Publisher(
+            '/single_joint_actuator/lwheel/command', Float64, queue_size=10)
 
         # rospy.Subscriber('twist', Twist, self.twistCallback)
         rospy.Subscriber('/cmd_vel', Twist, self.twistCallback)
@@ -86,27 +89,30 @@ class TwistToMotors(object):
         # dx = (l + r) / 2
         # dr = (r - l) / w
 
-        self.right = 1.0 * self.dx + self.dr * self.L / 2
-        self.left = 1.0 * self.dx - self.dr * self.L / 2
+        self.right = (2.0*self.dx + self.dr*self.L)/(2.0*self.R)
+        self.left = (2.0*self.dx - self.dr*self.L)/(2.0*self.R)
         # rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
-        
-        # mapping makes tunning pid coefficents easier
-        self.right_mapped = interp(self.right, [-1, 1], [-200, 200])
-        self.left_mapped  = interp(self.left, [-1, 1], [-200, 200])
 
+        # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s)
+        
+        #self.right = interp(self.right, [-15, 15], [-255, 250])
+        #self.left = interp(self.left, [-15, 15], [-255, 250])
+        """
+        
         if(self.left_mapped < 0 and self.right_mapped > 0):
             self.motor_speed = [49, self.right_mapped]
-        elif(self.left_mapped > 0 and self.right_mapped < 0):	  
+        elif(self.left_mapped > 0 and self.right_mapped < 0):
             self.motor_speed = [self.left_mapped, 49]
         else:
             self.motor_speed = [self.left_mapped, self.right_mapped]
 
         self.pub_rmotor.publish(self.motor_speed[0])
         self.pub_lmotor.publish(self.motor_speed[1])
+        """
 
-        # self.pub_lmotor.publish(self.left_mapped)
-        # self.pub_rmotor.publish(self.right_mapped)
-            
+        self.pub_lmotor.publish(self.left)
+        self.pub_rmotor.publish(self.right)
+
         self.ticks_since_target += 1
 
     #############################################################
@@ -120,10 +126,11 @@ class TwistToMotors(object):
     
     def shutdown(self):        
         rospy.loginfo("Stop roachBot")
-        self.motor_speed.data = {0}
-        self.pub_motors.publish(self.motor_speed)
+        #self.motor_speed = [0,0]
+        self.pub_rmotor.publish(0.0)
+        self.pub_lmotor.publish(0.0)
         # makes sure robot receive the stop cmd prior to shutting down
-        self.rospy.sleep(1)
+        rospy.sleep(1)
 
 #############################################################
 #############################################################

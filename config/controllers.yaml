@@ -16,9 +16,10 @@ single_joint_actuator:
       type: effort_controllers/JointVelocityController
       joint: joint1
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
-      pid: {p: 1.1, i: 0.00162, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
-      #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
+      pid: {p: 12.5, i: 3.65, d: 0, i_clamp_min: -100.0, i_clamp_max: 100, antiwindup: True}
+      #pid: {p: 12.5, i: 3.65, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
+    # lwheel is the topic for h/w interface to publish
     lwheel:
       type: effort_controllers/JointVelocityController
       joint: joint2
@@ -26,5 +27,5 @@ single_joint_actuator:
       pid: {p: 1.1, i: 0.00162, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
       #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
-    wheel_separation : 0.2
+    wheel_separation : 0.15
     wheel_radius : 0.035

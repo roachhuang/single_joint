@@ -7,7 +7,6 @@ ROBOTHardwareInterface::ROBOTHardwareInterface(ros::NodeHandle& nh) : nh_(nh) {
     loop_hz_=5;	
     ros::Duration update_freq = ros::Duration(1.0/loop_hz_);
 	
-	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino",10);
 	pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino",10);
 	client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
 	
@@ -64,6 +63,7 @@ void ROBOTHardwareInterface::read() {
 	if(client.call(joint_read))
 	{
 	    pos[0] = angles::from_degrees(joint_read.response.pos);
+		pos[0] = angles::normalize_angle(joint_read.response.pos);
 	    vel[0] = angles::from_degrees(joint_read.response.vel);
 	    ROS_INFO("Current Pos: %.2f, Vel: %.2f",pos[0], vel[0]);
 /*
@@ -89,11 +89,8 @@ void ROBOTHardwareInterface::write(ros::Duration elapsed_time) {
 if more than one joint,
     publish values for joint_effort_command_2,......
 */	
-	
 	ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
-	pub.publish(joints_pub);
-	
-		
+	pub.publish(joints_pub);	
 }
 
 int main(int argc, char** argv)
