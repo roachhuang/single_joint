@@ -89,16 +89,16 @@ class TwistToMotors(object):
         # dx = (l + r) / 2
         # dr = (r - l) / w
 
+        # the unit of self.right is rad/s 
         self.right = (2.0*self.dx + self.dr*self.L)/(2.0*self.R)
         self.left = (2.0*self.dx - self.dr*self.L)/(2.0*self.R)
         # rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
 
-        # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s)
-        
+        # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s) 
         #self.right = interp(self.right, [-15, 15], [-255, 250])
         #self.left = interp(self.left, [-15, 15], [-255, 250])
-        """
-        
+
+        """       
         if(self.left_mapped < 0 and self.right_mapped > 0):
             self.motor_speed = [49, self.right_mapped]
         elif(self.left_mapped > 0 and self.right_mapped < 0):

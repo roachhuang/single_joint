@@ -62,10 +62,14 @@ void ROBOTHardwareInterface::read() {
 	
 	if(client.call(joint_read))
 	{
-	    pos[0] = angles::from_degrees(joint_read.response.pos);
-		pos[0] = angles::normalize_angle(joint_read.response.pos);
-	    vel[0] = angles::from_degrees(joint_read.response.vel);
-	    ROS_INFO("Current Pos: %.2f, Vel: %.2f",pos[0], vel[0]);
+	    pos[0] = angles::from_degrees(joint_read.response.pos1);
+		pos[0] = angles::normalize_angle(pos[0]);
+	    vel[0] = angles::from_degrees(joint_read.response.vel1);
+
+		pos[1] = angles::from_degrees(joint_read.response.pos2);
+		pos[1] = angles::normalize_angle(pos[1]);
+	    vel[1] = angles::from_degrees(joint_read.response.vel2);
+	    ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);
 /*
 if more than one joint,
         get values for joint_position_2, joint_velocity_2,......
@@ -88,6 +92,7 @@ void ROBOTHardwareInterface::write(ros::Duration elapsed_time) {
 /*
 if more than one joint,
     publish values for joint_effort_command_2,......
+	pub vl and vr to topic /joints_to_aurdino, subscribed by arduino
 */	
 	ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
 	pub.publish(joints_pub);	
