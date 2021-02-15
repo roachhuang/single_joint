@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 #encoding: utf8
 import rospy
-from rospy_tutorials.msg import Floats
-
-# from sensor_msgs.msg import JointState
+#from rospy_tutorials.msg import Floats
+from sensor_msgs.msg import JointState
 # <packagename>.srv
 from diff_drive.srv import joint_state, joint_stateResponse
 # from Float_array.srv import Floats_array, Float_arrayResponse, Float_arrayRequest
@@ -12,29 +11,35 @@ class Wheel_state(object):
         rospy.init_node("wheel_states")
         nodename = rospy.get_name()
         rospy.loginfo("%s started" % nodename)
-        self.pos=[0,0]        
-        self.vel=[0,0]       
-        rospy.Subscriber("/joint1_states_from_arduino", Floats, self.joint1_callback, queue_size=10)
-        rospy.Subscriber("/joint2_states_from_arduino", Floats, self.joint2_callback, queue_size=10)
+        self.pos0=self.pos1=0        
+        self.vel0=self.vel1=0       
+        rospy.Subscriber("/joint1_states_from_arduino", JointState, self.joint1_callback, queue_size=10)
+        #rospy.Subscriber("/joint2_states_from_arduino", Floats, self.joint2_callback, queue_size=10)
 
     def joint1_callback(self, msg):        
-        self.pos[0]=msg.data[0]
-        self.vel[0]=msg.data[1]  
+        #self.pos[0]=msg.data[0]
+        #self.vel[0]=msg.data[1]
+        self.pos0=msg.position[0]
+        self.vel0=msg.velocity[0]
+
+        self.pos1=msg.position[1]
+        self.vel1=msg.velocity[1]  
         #print "Pos: ", pos, "vel: ", vel
         #rospy.loginfo(rospy.get_caller_id() + "I heard %s", msg)
-                 
+    """             
     def joint2_callback(self, msg):        
         self.pos[1]=msg.data[0]
         self.vel[1]=msg.data[1]
+    """
 
     # for h/w interface to call server service.
     def my_server(self, req):
         global pos, vel
         res = joint_stateResponse() 
-        res.pos1=self.pos[0]
-        res.vel1=self.vel[0]
-        res.pos2=self.pos[1]
-        res.vel2=self.vel[1]
+        res.pos1=self.pos0
+        res.vel1=self.vel0
+        res.pos2=self.pos1
+        res.vel2=self.vel1
         res.success = True
         return res
 
