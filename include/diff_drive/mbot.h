@@ -12,23 +12,21 @@
 class MyRobot : public hardware_interface::RobotHW
 {
 public:
-	MyRobot()
-	{
+	MyRobot(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
+	{		
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
 		// E.g. parse the URDF for joint names & interfaces, then initialize them
-	}
+	//}
 
-	bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
-	{
+	// bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
+	//{
 		// Create a JointStateHandle for each joint and register them with the 
 		// JointStateInterface.
 		hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
 		jnt_state_interface.registerHandle(state_handle_a);
-
 		hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
 		jnt_state_interface.registerHandle(state_handle_b);
-
 		// Register the JointStateInterface containing the read only joints
 		// with this robot's hardware_interface::RobotHW.
 		registerInterface(&jnt_state_interface);
@@ -38,20 +36,27 @@ public:
 		// register them with the JointPositionInterface.
 		hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
 		jnt_pos_interface.registerHandle(pos_handle_a);
-
 		hardware_interface::JointHandle pos_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
 		jnt_pos_interface.registerHandle(pos_handle_b);
-
 		// Register the JointPositionInterface containing the read/write joints
 		// with this robot's hardware_interface::RobotHW.
 		registerInterface(&jnt_pos_interface);
 
+		hardware_interface::JointHandle effort_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
+		effort_joint_interface.registerHandle(effort_handle_a);	
+		hardware_interface::JointHandle effort_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
+		effort_joint_interface.registerHandle(effort_handle_b);
+		// Register the JointEffortInterface containing the read/write joints
+		// with this robot's hardware_interface::RobotHW.
+		registerInterface(&effort_joint_interface);
+
 		pub = root_nh.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
 		client = root_nh.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
-		return true;
+		// return true;
 	}
-	void read() {
+
+	void read(ros::Time time, ros::Duration period) {
 		if (client.call(joint_read))
 		{
 			pos[0] = angles::from_degrees(joint_read.response.pos1);
@@ -70,7 +75,7 @@ public:
 		}
 
 	}
-	void write() {
+	void write(ros::Time time, ros::Duration period) {
 		// effortJointSaturationInterface.enforceLimits(elapsed_time);    
 		joints_pub.data.clear();
 		joints_pub.data.push_back(cmd[0]);
@@ -90,6 +95,7 @@ private:
 	// To only read joint positions, avoid conflicts using 
 	// hardware_interface::JointStateInterface.
 	hardware_interface::PositionJointInterface jnt_pos_interface;
+	hardware_interface::EffortJointInterface effort_joint_interface;
 
 	// Data member array to store the controller commands which are sent to the 
 	// robot's resources (joints, actuators)
