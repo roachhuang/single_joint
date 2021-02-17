@@ -1,3 +1,4 @@
+/*
 #include "ros/ros.h"
 #include "diff_drive/joint_state.h"
 #include <cstdlib>
@@ -23,3 +24,4 @@ int main(int argc, char **argv)
 
   return 0;
 }
+*/

@@ -1,10 +1,11 @@
 #include <ros/ros.h>
-#include <diff_drive/mbot.h>
+#include <my_robot/my_robot.h>
 #include <controller_manager/controller_manager.h>
 
-main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 	// Initialize the ROS node
-	ros::init(argc, argv, "mbot_hardware_interface");
+	ros::init(argc, argv, "my_robot");
 
 	// Create an instance of your robot so that this instance knows about all 
 	// the resources that are available.
@@ -25,7 +26,7 @@ ros:AsyncSpinner spinner(1);
 	while (ros::ok())
 	{
 		// Basic bookkeeping to get the system time in order to compute the control period.
-		const ros::Time time = ros:Time::now();
+		const ros::Time     time = ros:Time::now();
 		const ros::Duration period = time - prev_time;
 
 		// Execution of the actual control loop.

@@ -154,12 +154,12 @@ include_directories(
 
 
 add_executable(single_joint_hardware_interface src/single_joint_hardware_interface.cpp)
-add_executable(test_service src/test_service.cpp)
+#add_executable(test_service src/test_service.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
 #add_dependencies(robot_hardware_interface diff_drive_gencpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(test_service ${catkin_LIBRARIES})
+#target_link_libraries(test_service ${catkin_LIBRARIES})
 ##target_link_libraries(${PROJECT_NAME}_node
 ##   ${catkin_LIBRARIES}
 ## )

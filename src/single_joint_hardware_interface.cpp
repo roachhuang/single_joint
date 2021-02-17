@@ -4,7 +4,7 @@
 ROBOTHardwareInterface::ROBOTHardwareInterface(ros::NodeHandle& nh) : nh_(nh) {
     init();
     controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-    loop_hz_=5;
+    loop_hz_=5;	
     ros::Duration update_freq = ros::Duration(1.0/loop_hz_);
 	
 	pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino",10);
@@ -17,64 +17,36 @@ ROBOTHardwareInterface::~ROBOTHardwareInterface() {
 }
 
 void ROBOTHardwareInterface::init() {
-    
-    
-	joint_name_="joint1";
-    
-// Create joint state interface
-    hardware_interface::JointStateHandle jointStateHandle(joint_name_, &joint_position_, &joint_velocity_, &joint_effort_);
-    joint_state_interface_.registerHandle(jointStateHandle);
+	// Initialization of the robot's resources (joints, sensors, actuators) and
+	// interfaces can be done here or inside init().
+	// E.g. parse the URDF for joint names & interfaces, then initialize them
+	/* Create a JointStateHandle for each joint and register them with the JointStateInterface.
+	** connect and register the joint state interface
+	*/
+	hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
+	jnt_state_interface_.registerHandle(state_handle_a);
 
-// Create position joint interface
-    //hardware_interface::JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_);
-    //position_joint_interface_.registerHandle(jointPositionHandle);
-    
-// Create velocity joint interface
-	//hardware_interface::JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_);
-    //effort_joint_interface_.registerHandle(jointVelocityHandle);
-    
-// Create effort joint interface
-    hardware_interface::JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_);
-	effort_joint_interface_.registerHandle(jointEffortHandle);
-	
-// Create Joint Limit interface   
-    // joint_limits_interface::JointLimits limits;
-    // joint_limits_interface::getJointLimits("joint1", nh_, limits);
-    
-	// joint_limits_interface::EffortJointSaturationHandle jointLimitsHandle(jointEffortHandle, limits);
-	// effortJointSaturationInterface.registerHandle(jointLimitsHandle);
-	
-/*
-If you have more joints then,
-    joint_name_= "joint2"
-    
-// Create joint state interface
-    hardware_interface::JointStateHandle jointStateHandle2(joint_name_, &joint_position_2, &joint_velocity_2, &joint_effort_2);
-    joint_state_interface_.registerHandle(jointStateHandle);
-//create the position/velocity/effort interface according to your actuator 
-    hardware_interface::JointHandle jointPositionHandle2(jointStateHandle2, &joint_position_command_2);
-    position_joint_interface_.registerHandle(jointPositionHandle2);
-    
-    hardware_interface::JointHandle jointVelocityHandle2(jointStateHandle2, &joint_velocity_command_2);
-    effort_joint_interface_.registerHandle(jointVelocityHandle2);
-    
-    hardware_interface::JointHandle jointEffortHandle2(jointStateHandle2, &joint_effort_command_2);
-	effort_joint_interface_.registerHandle(jointEffortHandle2);
-	
-//create joint limit interface.
-    joint_limits_interface::getJointLimits("joint2", nh_, limits);
-	joint_limits_interface::EffortJointSaturationHandle jointLimitsHandle2(jointEffortHandle2, limits);
-	effortJointSaturationInterface.registerHandle(jointLimitsHandle2);
-	
-	Repeat same for other joints
-*/
-	
+	// left joint
+	hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
+	jnt_state_interface_.registerHandle(state_handle_b);
 
-// Register all joints interfaces    
-    registerInterface(&joint_state_interface_);
-    // registerInterface(&position_joint_interface_);
-    registerInterface(&effort_joint_interface_);
-    // registerInterface(&effortJointSaturationInterface);
+	// Register the JointStateInterface containing the read only joints
+	// with this robot's hardware_interface::RobotHW.
+	registerInterface(&jnt_state_interface_);
+
+	// connect and register the joint position interface
+	// Create a JointHandle (read and write) for each controllable joint
+	// using the read-only joint handles within the JointStateInterface and 
+	// register them with the JointEffortInterface.
+	hardware_interface::JointHandle effort_handle_a(jnt_state_interface_.getHandle("joint1"), &cmd[0]);
+	effort_joint_interface_.registerHandle(effort_handle_a);
+	
+	hardware_interface::JointHandle effort_handle_b(jnt_state_interface_.getHandle("joint2"), &cmd[1]);
+	effort_joint_interface_.registerHandle(effort_handle_b);
+
+	// Register the JointEffortInterface containing the read/write joints
+	// with this robot's hardware_interface::RobotHW.
+	registerInterface(&effort_joint_interface_);
 }
 
 void ROBOTHardwareInterface::update(const ros::TimerEvent& e) {
@@ -90,9 +62,14 @@ void ROBOTHardwareInterface::read() {
 	
 	if(client.call(joint_read))
 	{
-	    joint_position_ = angles::from_degrees(joint_read.response.pos);
-	    joint_velocity_ = angles::from_degrees(joint_read.response.vel);
-	    ROS_INFO("Current Pos: %.2f, Vel: %.2f",joint_position_,joint_velocity_);
+	    pos[0] = angles::from_degrees(joint_read.response.pos1);
+		pos[0] = angles::normalize_angle(pos[0]);
+	    vel[0] = angles::from_degrees(joint_read.response.vel1);
+
+		pos[1] = angles::from_degrees(joint_read.response.pos2);
+		pos[1] = angles::normalize_angle(pos[1]);
+	    vel[1] = angles::from_degrees(joint_read.response.vel2);
+	    ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);
 /*
 if more than one joint,
         get values for joint_position_2, joint_velocity_2,......
@@ -101,34 +78,30 @@ if more than one joint,
 	}
 	else
 	{
-	    joint_position_ = 0;
-	    joint_velocity_ = 0;
-	}
-        
-
+	    pos[2] = {0};
+	    vel[2] = {0};		
+	}      
 }
 
 void ROBOTHardwareInterface::write(ros::Duration elapsed_time) {
    
     // effortJointSaturationInterface.enforceLimits(elapsed_time);    
 	joints_pub.data.clear();
-	joints_pub.data.push_back(joint_effort_command_);
-	
+	joints_pub.data.push_back(cmd[0]);
+	joints_pub.data.push_back(cmd[1]);
 /*
 if more than one joint,
     publish values for joint_effort_command_2,......
+	pub vl and vr to topic /joints_to_aurdino, subscribed by arduino
 */	
-	
-	ROS_INFO("PWM Cmd: %.2f",joint_effort_command_);
-	pub.publish(joints_pub);
-		
+	ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
+	pub.publish(joints_pub);	
 }
-
-
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "single_joint_hardware_interface");
+    // ros::init(argc, argv, "single_joint_hardware_interface");
+    ros::init(argc, argv, "roachbot_hardware_interface");
     ros::NodeHandle nh;
     //ros::AsyncSpinner spinner(4);  
     ros::MultiThreadedSpinner spinner(2); // Multiple threads for controller service callback and for the Service client callback used to get the feedback from ardiuno
