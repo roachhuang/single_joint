@@ -17,10 +17,6 @@ public:
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
 		// E.g. parse the URDF for joint names & interfaces, then initialize them
-	//}
-
-	// bool init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
-	//{
 		// Create a JointStateHandle for each joint and register them with the 
 		// JointStateInterface.
 		hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);

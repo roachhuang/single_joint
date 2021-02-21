@@ -4,20 +4,37 @@
 #include <sensor_msgs/JointState.h>
 #include <TimerOne.h>
 
-#define encoderPinA1      2                       // Quadrature encoder A pin
-#define encoderPinB1      5                       // Quadrature encoder B pin
-#define EnA 6
-#define In1 7 // right motor
-#define In2 8
+#define uno
+#ifdef uno
+  // pid 4, 0.007 to begin with 
+  // right
+  #define ENCODER_PINA1 3                       // Quadrature encoder A pin for right wheel  
+  #define ENA 5 // brown
+  #define IN1 6 // red
+  #define IN2 7 // orange
 
-#define encoderPinA2  3
-#define EnB 9
-#define In3 10 // left motor
-#define In4 11
+  #define ENCODER_PINA2  2
+  #define ENB 11  // black
+  #define IN3 12  // yellow
+  #define IN4 13  // green
+  #define N 20
+#else
+  #define ENCODER_PINA1 2                       // Quadrature encoder A pin
+  #define ENCODER_PINB1 5                       // Quadrature encoder B pin 
+  #define ENA 6
+  #define IN1 7 // right motor
+  #define IN2 8
 
+  #define ENCODER_PINA2  3
+  #define ENB 9
+  #define IN3 10 // left motor
+  #define IN4 11
+  #define N 806
+#endif
 
 // #define N   1612.0 // ticks per revolution, this is test by manually turn the motor 360 degree to get tick number.
-const float N = 806;
+// const float N = 20;
+// const float N = 806;
 ros::NodeHandle  nh;
 
 double vl, vr;
@@ -48,31 +65,33 @@ void setup() {
   nh.advertise(joint1_pub);
   // nh.advertise(joint2_pub);
 
-  pinMode(encoderPinA1, INPUT_PULLUP);                  // quadrature encoder input A
-  pinMode(encoderPinB1, INPUT_PULLUP);                  // quadrature encoder input B
-  pinMode(encoderPinA2, INPUT_PULLUP);                  // quadrature encoder2 input A
+  pinMode(ENCODER_PINA1, INPUT_PULLUP);                  // quadrature encoder input A
+  #ifndef uno
+    pinMode(ENCODER_PINB1, INPUT_PULLUP);                  // quadrature encoder input B
+  #endif    
+  pinMode(ENCODER_PINA2, INPUT_PULLUP);                  // quadrature encoder2 input A
 
   //initialize Pin States
-  // digitalWrite(encoderPinA1, LOW);
-  // digitalWrite(encoderPinB1, LOW);
-  pinMode(EnA, OUTPUT);
-  pinMode(In1, OUTPUT);
-  pinMode(In2, OUTPUT);
-  pinMode(EnB, OUTPUT);
-  pinMode(In3, OUTPUT);
-  pinMode(In4, OUTPUT);
+  // digitalWrite(ENCODER_PINA1, LOW);
+  // digitalWrite(ENCODER_PINB1, LOW);
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
 
   right_ticks = left_ticks = vl = vr = 0;
 
   Timer1.initialize(200000);  // 200ms
-  attachInterrupt(digitalPinToInterrupt(encoderPinA1), rEncoder, FALLING);               // update encoder position
-  attachInterrupt(digitalPinToInterrupt(encoderPinA2), lEncoder, FALLING);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), rEncoder, FALLING);               // update encoder position
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), lEncoder, FALLING);
 
   Timer1.attachInterrupt(ISR_timerone);
   // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
 
-  digitalWrite(In1, HIGH);
-  digitalWrite(In2, LOW);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
   // analogWrite(EnA, 80);  // left
 }
 
@@ -103,16 +122,24 @@ void loop() {
   // nh.spinOnce();
 }
 
-void lEncoder()  {  
-  left_ticks++;
+
+void lEncoder()  { 
+  #ifdef uno 
+    left_ticks++;
+  #else
+    // right_ticks += digitalRead(ENCODER_PINB2) ? 1 : -1;
+  #endif
 }
 
 void rEncoder()  {
-  // CW->-1; CCW->+1
-  right_ticks += digitalRead(encoderPinB1) ? 1 : -1;
-
+  #ifdef uno
+    right_ticks++;
+  #else
+    // CW->-1; CCW->+1
+    right_ticks += digitalRead(ENCODER_PINB1) ? 1 : -1;
+  #endif
   /*
-     if (digitalRead(encoderPinB1) == digitalRead(encoderPinA1) )
+     if (digitalRead(ENCODER_PINB1) == digitalRead(ENCODER_PINA1) )
      {
       encoderPos++; //you may need to redefine positive and negative directions
      }
@@ -126,9 +153,14 @@ void rEncoder()  {
 void ISR_timerone() {
   cli();
   // 360 * encoderPos /N
-  temp[0] = right_ticks * 0.4467;
-  temp[1] = left_ticks * 0.4467;
-  right_ticks = left_ticks  = 0;
+  #ifdef uno
+    temp[0] = right_ticks * 18.0;
+    temp[1] = left_ticks * 18.0;
+  #else
+    temp[0] = right_ticks * 0.4467;
+    temp[1] = left_ticks * 0.4467;
+  #endif
+  right_ticks = left_ticks = 0;
   sei();
   /*
     vel[0] = temp * 5.0;
@@ -137,20 +169,12 @@ void ISR_timerone() {
   */
   vel[0] = temp[0] * 5.0;
   pos[0] += temp[0];
+  
   vel[1] = temp[1] * 5.0;
   pos[1]+= temp[1];
   // let h/w interface do the normalization
   // pos = fmod(pos, 360.0);
 
-  // actuator_state.position = pos;
-  // actuator.velocity = vel;
-
-  // jnt_state.name.resize(2);
-  // jnt_state.position.resize(2);
-  // jnt_state.velocity.resize(2);
-  // jnt_state.name[0]="rWheel";  
-  // jnt_state.name[1]="lWheel";  
-  // jnt_state.header.stamp = rs::Time::now();
   jnt_state.position_length=2;
   jnt_state.velocity_length=2;
   jnt_state.position=pos;   
@@ -176,16 +200,16 @@ void ISR_timerone() {
 void rpwmOut(float out) {
   if (out < 0) {
     // drive motor CW
-    digitalWrite(In1, HIGH);
-    digitalWrite(In2, LOW);
-    analogWrite(EnA, abs(out));
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENA, abs(out));
 
   }
   else {
     // drive motor CCW
-    digitalWrite(In1, LOW);
-    digitalWrite(In2, HIGH);
-    analogWrite(EnA, out);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(ENA, out);
 
   }
 }
@@ -193,16 +217,16 @@ void rpwmOut(float out) {
 void lpwmOut(float out) {
   if (out < 0) {
     // drive motor CW
-    digitalWrite(In3, HIGH);
-    digitalWrite(In4, LOW);
-    analogWrite(EnB, abs(out));
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENB, abs(out));
 
   }
   else {
     // drive motor CCW
-    digitalWrite(In3, LOW);
-    digitalWrite(In4, HIGH);
-    analogWrite(EnB, out);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    analogWrite(ENB, out);
 
   }
 }
