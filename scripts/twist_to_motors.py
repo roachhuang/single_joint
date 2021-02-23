@@ -55,7 +55,7 @@ class TwistToMotors(object):
         self.pub_rmotor = rospy.Publisher(
             '/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
         self.pub_lmotor = rospy.Publisher(
-            '/single_joint_actuator/lwheel/command', Float64, queue_size=10)
+            '/single_joint_actuator/lwheel/command', Float64, queue_size=1)
 
         # rospy.Subscriber('twist', Twist, self.twistCallback)
         rospy.Subscriber('/cmd_vel', Twist, self.twistCallback)
@@ -89,9 +89,14 @@ class TwistToMotors(object):
         # dx = (l + r) / 2
         # dr = (r - l) / w
 
-        # the unit of self.right is rad/s 
+        # note that if setpoint=rad/s, than input(feedback unit) has to be also rad/s so pid will operate properly.
+        #the unit is rad/s 
         self.right = (2.0*self.dx + self.dr*self.L)/(2.0*self.R)
         self.left = (2.0*self.dx - self.dr*self.L)/(2.0*self.R)
+
+        # m/s
+        #self.right = 1.0*self.dx + self.dr*self.L/2.0
+        #self.left = 1.0*self.dx - self.dr*self.L/2.0
         # rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
 
         # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s) 
