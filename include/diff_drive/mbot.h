@@ -5,8 +5,10 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 
-#include <rospy_tutorials/Floats.h>
-#include <diff_drive/joint_state.h>
+#include <std_msgs/Int32.h>
+
+// #include <rospy_tutorials/Floats.h>
+// #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
 
 class MyRobot : public hardware_interface::RobotHW
@@ -46,8 +48,10 @@ public:
 		// with this robot's hardware_interface::RobotHW.
 		registerInterface(&effort_joint_interface);
 
-		pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-		client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
+		// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+		vl_pub = nh_.advertise<std_msgs::Int32>("/vl", 10);
+		vr_pub = nh_.advertise<std_msgs::Int32>("/vr", 10);
+		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
 		// return true;
 	}
@@ -77,13 +81,23 @@ public:
 		}
 
 	}
+
 	void write(ros::Time time, ros::Duration period) {
-		// effortJointSaturationInterface.enforceLimits(elapsed_time);    
-		joints_pub.data.clear();
-		joints_pub.data.push_back(cmd[0]);
-		joints_pub.data.push_back(cmd[1]);
+		std_msgs::Int32 vr;
+		std_msgs::Int32 vl;
+
+		// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
 		ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
-		pub.publish(joints_pub);
+		vr.data = cmd[0];
+		vr_pub.publish(vr);
+
+		/*left_motor.data = output_left / max_velocity_ * 100.0;
+        right_motor.data = output_right / max_velocity_ * 100.0;		
+		*/
+		// left motor
+		vl.data = cmd[1];
+		vl_pub.publish(vl);
+		// pub.publish(joints_pub);
 	}
 
 private:
@@ -109,9 +123,10 @@ private:
 	double eff[2];
 
 	ros::Publisher pub;
-	ros::ServiceClient client;
-	rospy_tutorials::Floats joints_pub;
-	diff_drive::joint_state joint_read;
+	// ros::ServiceClient client;
+	// rospy_tutorials::Floats joints_pub;
+	// diff_drive::joint_state joint_read;	
+	
 };
 
 #endif
