@@ -15,7 +15,11 @@ class MyRobot : public hardware_interface::RobotHW
 {
 public:
 	MyRobot(ros::NodeHandle &nh, urdf::Model *urdf_model) : name_("hardware_interface"), nh_(nh)
-	{		
+	{	
+		ROS_INFO("Initializing roachbot Hardware Interface ...");
+		num_joints_ = joint_names_.size();
+		ROS_INFO("Number of joints: %d", (int)num_joints_);
+
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
 		// E.g. parse the URDF for joint names & interfaces, then initialize them
@@ -51,6 +55,8 @@ public:
 		// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
 		vl_pub = nh_.advertise<std_msgs::Int32>("/vl", 10);
 		vr_pub = nh_.advertise<std_msgs::Int32>("/vr", 10);
+		nh_subscribe("/lwheel", 1, &lwheel_cb);
+		nh_subscribe("/rwheel", 1, &rwheel_cb);
 		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
 		// return true;
@@ -63,23 +69,18 @@ public:
 	}
 
 	void read(ros::Time time, ros::Duration period) {
-		if (client.call(joint_read))
-		{
-			pos[0] = angles::from_degrees(joint_read.response.pos1);
-			pos[0] = angles::normalize_angle(pos[0]);
-			vel[0] = angles::from_degrees(joint_read.response.vel1);
+		ros::Duration elapsed_time = period;
+		double wheel_angles[2];
+		double wheel_angle_deltas[2];
 
-			pos[1] = angles::from_degrees(joint_read.response.pos2);
-			pos[1] = angles::normalize_angle(pos[1]);
-			vel[1] = angles::from_degrees(joint_read.response.vel2);
-			ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f", pos[0], vel[0], pos[1], vel[1]);
-		}
-		else
-		{
-			pos[2] = { 0 };
-			vel[2] = { 0 };
-		}
-
+		for (std::size_t i = 0; i < 2; i++) {
+			wheel_angles[i] = ticksToAngle(encoder_ticks_[i]);
+			//double wheel_angle_normalized = normalizeAngle(wheel_angle);
+			wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
+			pos[i]+= wheel_angle_deltas[i];
+			vel[i]= wheel_angle_deltas[i] / period.toSec();
+			eff[i] = 0;
+		}			
 	}
 
 	void write(ros::Time time, ros::Duration period) {
@@ -98,6 +99,23 @@ public:
 		vl.data = cmd[1];
 		vl_pub.publish(vl);
 		// pub.publish(joints_pub);
+	}
+protected:
+	void lwheel_cb(const std_msgs::Int32& msg) {
+		encoder_ticks[0] = msg->data;
+		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg->data);
+	}
+	void rwheel_cb(const std_msgs::Int32& msg) {
+		encoder_ticks[1] = msg->data;
+		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg->data);
+	}
+
+	double ticksToAngle(const int32_t& ticks) const
+	{
+		// Convert number of encoder ticks to angle in radians
+		double angle = (double)ticks * (2.0 * M_PI / 542.0);
+		ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
+		return angle;
 	}
 
 private:
@@ -121,6 +139,7 @@ private:
 	double pos[2];
 	double vel[2];
 	double eff[2];
+	std_msgs::Int32	encoder_ticks[2];
 
 	ros::Publisher pub;
 	// ros::ServiceClient client;
