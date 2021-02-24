@@ -1,8 +1,7 @@
 
 #include <ros.h>
 #include <rospy_tutorials/Floats.h>
-#include <sensor_msgs/JointState.h>
-#include <TimerOne.h>
+#include <std_msgs/Int32.h>
 
 #define uno
 #ifdef uno
@@ -32,38 +31,31 @@
   #define N 806
 #endif
 
-// #define N   1612.0 // ticks per revolution, this is test by manually turn the motor 360 degree to get tick number.
-// const float N = 20;
-// const float N = 806;
+// ticks per revolution, this has to be tested by manually turn the motor 360 degree to get tick number.
+
 ros::NodeHandle  nh;
 
 double vl, vr;
-volatile int right_ticks, left_ticks;
-float temp[2]={0};
-// rospy_tutorials::Floats lstate, rstate;
-sensor_msgs::JointState jnt_state;
+volatile int32_t right_ticks, left_ticks;
 
 void set_angle_cb( const rospy_tutorials::Floats& cmd_msg) {
   vr = cmd_msg.data[0];
   vl = cmd_msg.data[1];
 }
 
+std_msgs::Int32 int_ticksLeft;
+std_msgs::Int32 int_ticksRight;
+
 ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino", set_angle_cb);
+ros::Publisher left_ticks_pub("/lwheel", &int_ticksLeft);
+ros::Publisher right_ticks_pub("/rwheel", &int_ticksRight);
 
-ros::Publisher joint1_pub("/joint1_states_from_arduino", &jnt_state);
-// ros::Publisher joint2_pub("/joint2_states_from_arduino", &rstate);
-
-// volatile float pos[1] = {0}, vel[1] = {0};
-// has to be double and cannot be volatile otherwise publish won't work (not knowing why)
-float pos[2]={0}, vel[2]={0};
-
-void setup() {
-  // Serial.begin(57600);
-  // nh.getHardware()->setBaud(57600);
+void setup() { 
   nh.initNode();
-  nh.subscribe(sub);
-  nh.advertise(joint1_pub);
-  // nh.advertise(joint2_pub);
+  nh.loginfo("roachbot wheel encoders:");
+  nh.subscribe(sub); 
+  nh.advertise(left_ticks_pub);
+  nh.advertise(right_ticks_pub);
 
   pinMode(ENCODER_PINA1, INPUT_PULLUP);                  // quadrature encoder input A
   #ifndef uno
@@ -88,38 +80,23 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), lEncoder, FALLING);
 
   Timer1.attachInterrupt(ISR_timerone);
-  // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
+  TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
 
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  // analogWrite(EnA, 80);  // left
 }
 
 void loop() {
-  rpwmOut(constrain(vr, -249, 249));
-  lpwmOut(constrain(vl, -249, 249));
-  
-  // sprintf(buffer, "degree： %d", encoderPos);
-  // nh.loginfo(buffer);
-  /*
-    if ((now - lasttimepub) >= 200)
-    {
-      sprintf(buffer, "degree： %1d", vel[0]);
-      nh.loginfo(buffer);
-      // pos[0] = encoderPos * 0.447;
-      // vel[0] = pos[0] * 10;
-      // encoderPos = 0;
-      // joint_name[0]='joint1';
-      // must give length, otherwise gets runtime index error
-      joint_state.position_length = 1;
-      joint_state.velocity_length = 1;
-      joint_state.position = pos;
-      joint_state.velocity = vel;
-      pub.publish(&joint_state);
-      lasttimepub = now;
-    }
-  */
-  // nh.spinOnce();
+  rpwmOut(constrain(vr, -200, 200));
+  lpwmOut(constrain(vl, -200, 200));  
+
+  cli();
+  int_ticksLeft.data = left_ticks;
+  int_ticksRight.data = right.ticks;
+  sei();
+
+  left_ticks_pub.publish(&int_ticksLeft);
+  right_ticks.pub.publish(&int_ticksRight);
+
+  nh.spinOnce();
 }
 
 
@@ -137,96 +114,19 @@ void rEncoder()  {
   #else
     // CW->-1; CCW->+1
     right_ticks += digitalRead(ENCODER_PINB1) ? 1 : -1;
-  #endif
-  /*
-     if (digitalRead(ENCODER_PINB1) == digitalRead(ENCODER_PINA1) )
-     {
-      encoderPos++; //you may need to redefine positive and negative directions
-     }
-     else
-     {
-      encoderPos--;
-     }
-  */
+  #endif 
 }
 
-void ISR_timerone() {
-  cli();
-  // 360 * encoderPos /N
-  #ifdef uno
-    temp[0] = right_ticks * 18.0;
-    temp[1] = left_ticks * 18.0;
-  #else
-    temp[0] = right_ticks * 0.4467;
-    temp[1] = left_ticks * 0.4467;
-  #endif
-  right_ticks = left_ticks = 0;
-  sei();
-  /*
-    vel[0] = temp * 5.0;
-    pos[0] += temp ;
-    pos[0] = fmod(pos[0], 360.0);
-  */
-  vel[0] = temp[0] * 5.0;
-  pos[0] += temp[0];
-  
-  vel[1] = temp[1] * 5.0;
-  pos[1]+= temp[1];
-  // let h/w interface do the normalization
-  // pos = fmod(pos, 360.0);
-
-  jnt_state.position_length=2;
-  jnt_state.velocity_length=2;
-  jnt_state.position=pos;   
-  jnt_state.velocity=vel;
-  joint1_pub.publish(&jnt_state);
-  
-  /*
-  rstate.data_length = 2;
-  rstate.data[0] = pos[0];
-  rstate.data[1] = vel[0];  
-  // joint1_pub.publish(&rstate);
-  
-  // need to find a way to pub left and right states in one pub
-  lstate.data_length = 2;
-  lstate.data[0] = pos[1];
-  lstate.data[1] = vel[1];  
-  joint2_pub.publish(&lstate);
-  */
-  
-  nh.spinOnce();
-}
-
-void rpwmOut(float out) {
-  if (out < 0) {
+void rpwmOut(float out) { 
     // drive motor CW
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
+    digitalWrite(IN1, out < 0);
+    digitalWrite(IN2, out > 0);
     analogWrite(ENA, abs(out));
-
-  }
-  else {
-    // drive motor CCW
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, HIGH);
-    analogWrite(ENA, out);
-
-  }
 }
 
 void lpwmOut(float out) {
-  if (out < 0) {
     // drive motor CW
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
+    digitalWrite(IN3, out < 0);
+    digitalWrite(IN4, out > 0);
     analogWrite(ENB, abs(out));
-
-  }
-  else {
-    // drive motor CCW
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, HIGH);
-    analogWrite(ENB, out);
-
-  }
 }
