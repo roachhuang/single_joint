@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+// h/w interface
 #include <diff_drive/mbot.h>
 #include <controller_manager/controller_manager.h>
 
@@ -10,7 +11,7 @@ int main(int argc, char** argv)
 	// Create an instance of your robot so that this instance knows about all 
 	// the resources that are available.
 	ros::NodeHandle nh;
-	MyRobot robot=MyRobot(nh, nh);
+	MyRobot robot=MyRobot(nh);
 
 	// Create an instance of the controller manager and pass it the robot, 
 	// so that it can handle its resources.

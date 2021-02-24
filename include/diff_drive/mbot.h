@@ -12,7 +12,7 @@
 class MyRobot : public hardware_interface::RobotHW
 {
 public:
-	MyRobot(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
+	MyRobot(ros::NodeHandle &nh, urdf::Model *urdf_model) : name_("hardware_interface"), nh_(nh)
 	{		
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
@@ -46,10 +46,16 @@ public:
 		// with this robot's hardware_interface::RobotHW.
 		registerInterface(&effort_joint_interface);
 
-		pub = root_nh.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-		client = root_nh.serviceClient<diff_drive::joint_state>("/read_joint_state");
+		pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+		client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
 		// return true;
+	}
+
+	bool init(ros::NodeHandle& root_nh, ros:NodeHandle & robot_hw_nh)
+	{
+		ROS_INFO("... Done Initializing DiffBot Hardware Interface");
+		reurn true;
 	}
 
 	void read(ros::Time time, ros::Duration period) {
