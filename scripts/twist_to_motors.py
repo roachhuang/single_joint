@@ -51,7 +51,8 @@ class TwistToMotors(object):
         self.rate = rospy.get_param("rate", 50)
 
         # self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float64, queue_size=10)
-        # pub to h/w interface. the topic name must match with yaml and launch files.
+        # note that it pub to h/w interface and then h/w interface pub to arduion after pid
+        # the topic name must match with yaml and launch files.
         self.pub_rmotor = rospy.Publisher(
             '/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
         self.pub_lmotor = rospy.Publisher(

@@ -1,6 +1,6 @@
 
 #include <ros.h>
-#include <rospy_tutorials/Floats.h>
+// #include <rospy_tutorials/Floats.h>
 #include <std_msgs/Int32.h>
 
 #define uno
@@ -35,18 +35,23 @@
 
 ros::NodeHandle  nh;
 
-double vl, vr;
+int32_t vl, vr;
 volatile int32_t right_ticks, left_ticks;
 
-void set_angle_cb( const rospy_tutorials::Floats& cmd_msg) {
-  vr = cmd_msg.data[0];
+void get_vr_cb( const std_msgs::Int32 &cmd_msg) {
+  vr = cmd_msg.data;  
+}
+
+void get_vl_cb(const std_msgs::Int32 &cmd_msg) {   
   vl = cmd_msg.data[1];
 }
 
 std_msgs::Int32 int_ticksLeft;
 std_msgs::Int32 int_ticksRight;
 
-ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino", set_angle_cb);
+ros::Subscriber<std_msgs::Int32> sub("/vr", get_vr_cb);
+ros::Subscriber<std_msgs::Int32> sub("/vl", get_vl_cb);
+
 ros::Publisher left_ticks_pub("/lwheel", &int_ticksLeft);
 ros::Publisher right_ticks_pub("/rwheel", &int_ticksRight);
 
