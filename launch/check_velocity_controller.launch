@@ -15,12 +15,13 @@
 	<node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/>
 	<node name="twist_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen"/>
 
+	<!-- controllers.yaml: velocity controller -->
 	<group>
 		<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
 		<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
 		  args="
         	single_joint_actuator/joint_state_controller
-            single_joint_actuator/joint1_velocity_controller
+            single_joint_actuator/rwheel
 			single_joint_actuator/lwheel
         "/>
 	</group>

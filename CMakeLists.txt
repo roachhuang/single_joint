@@ -152,7 +152,7 @@ include_directories(
 ## add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 #add_dependencies(test_service diff_drive_gencpp)
 
-add_executable(mbot src/mbot.cpp)
+add_executable(mbot_class src/mbot_class.cpp)
 #add_executable(single_joint_hardware_interface src/single_joint_hardware_interface.cpp)
 #add_executable(test_service src/test_service.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
@@ -164,7 +164,7 @@ add_executable(mbot src/mbot.cpp)
 ##   ${catkin_LIBRARIES}
 ## )
 #target_link_libraries(single_joint_hardware_interface ${catkin_LIBRARIES})
-target_link_libraries(mbot ${catkin_LIBRARIES})
+target_link_libraries(mbot_class ${catkin_LIBRARIES})
 
 #############
 ## Install ##

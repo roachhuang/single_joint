@@ -19,13 +19,15 @@
 
 import rospy
 # import roslib
+# has to be Float64 for h/w interface.cmd is subscribed automatically by h/w interface
+# coz we specified in controller.yaml and launch file 
 from std_msgs.msg import Float64
 # from rospy_tutorials.msg import Floats
 # from std_msgs.msg import Int32MultiArray
 from geometry_msgs.msg import Twist
 
 # this is used to map -1, 1 (m/s) to -200, 200
-from numpy import interp
+# from numpy import interp
 
 #############################################################
 #############################################################
@@ -54,17 +56,17 @@ class TwistToMotors(object):
         # note that it pub to h/w interface and then h/w interface pub to arduion after pid
         # the topic name must match with yaml and launch files.
         self.pub_rmotor = rospy.Publisher(
-            '/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
+            '/single_joint_actuator/rwheel/command', Float64, queue_size=10)
         self.pub_lmotor = rospy.Publisher(
-            '/single_joint_actuator/lwheel/command', Float64, queue_size=1)
+            '/single_joint_actuator/lwheel/command', Float64, queue_size=10)
 
         # rospy.Subscriber('twist', Twist, self.twistCallback)
         rospy.Subscriber('/cmd_vel', Twist, self.twistCallback)
 
         self.timeout_ticks = rospy.get_param("~timeout_ticks", 2)
-        self.left = self.left_mapped = 0
-        self.right = self.right_mapped = 0
-        self.motor_speed = {}
+        self.left = 0
+        self.right = 0
+        # self.motor_speed = {}
 
     #############################################################
     def spin(self):

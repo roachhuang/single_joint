@@ -33,32 +33,33 @@
 
 // ticks per revolution, this has to be tested by manually turn the motor 360 degree to get tick number.
 
-ros::NodeHandle  nh;
-
+ros::NodeHandle nh;
+// pwm cmd
 int32_t vl, vr;
+
 volatile int32_t right_ticks, left_ticks;
 
-void get_vr_cb( const std_msgs::Int32 &cmd_msg) {
+void get_vr_cb(const std_msgs::Int32& cmd_msg) {
   vr = cmd_msg.data;  
 }
 
-void get_vl_cb(const std_msgs::Int32 &cmd_msg) {   
-  vl = cmd_msg.data[1];
+void get_vl_cb(const std_msgs::Int32& cmd_msg) {   
+  vl = cmd_msg.data;
 }
+
+ros::Subscriber<std_msgs::Int32> vr_sub("/vr", &get_vr_cb);
+ros::Subscriber<std_msgs::Int32> vl_sub("/vl", &get_vr_cb);
 
 std_msgs::Int32 int_ticksLeft;
 std_msgs::Int32 int_ticksRight;
-
-ros::Subscriber<std_msgs::Int32> sub("/vr", get_vr_cb);
-ros::Subscriber<std_msgs::Int32> sub("/vl", get_vl_cb);
-
 ros::Publisher left_ticks_pub("/lwheel", &int_ticksLeft);
 ros::Publisher right_ticks_pub("/rwheel", &int_ticksRight);
 
 void setup() { 
   nh.initNode();
-  nh.loginfo("roachbot wheel encoders:");
-  nh.subscribe(sub); 
+  // nh.loginfo("roachbot wheel encoders:");
+  nh.subscribe(vl_sub); 
+  nh.subscribe(vr_sub); 
   nh.advertise(left_ticks_pub);
   nh.advertise(right_ticks_pub);
 
@@ -80,12 +81,10 @@ void setup() {
 
   right_ticks = left_ticks = vl = vr = 0;
 
-  Timer1.initialize(200000);  // 200ms
+ 
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), rEncoder, FALLING);               // update encoder position
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), lEncoder, FALLING);
-
-  Timer1.attachInterrupt(ISR_timerone);
-  TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
+  // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
 
 }
 
@@ -93,10 +92,10 @@ void loop() {
   rpwmOut(constrain(vr, -200, 200));
   lpwmOut(constrain(vl, -200, 200));  
 
-  cli();
+  // noInterrupts();
   int_ticksLeft.data = left_ticks;
   int_ticksRight.data = right.ticks;
-  sei();
+  // sei();
 
   left_ticks_pub.publish(&int_ticksLeft);
   right_ticks.pub.publish(&int_ticksRight);
