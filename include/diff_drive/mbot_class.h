@@ -19,18 +19,18 @@ class MyRobot : public hardware_interface::RobotHW
 {
 public:
 	// MyRobot(ros::NodeHandle& nh);
-	MyRobot(ros::NodeHandle* nh);	
+	MyRobot(ros::NodeHandle* nh);
 	void read(ros::Time time, ros::Duration period);
 	void write(ros::Time time, ros::Duration period);
 
 private:
 	// helper functions (member methods)
 	void initializeHardwareInterface();
-    void initializeSubscribers();
-    void initializePublishers();
+	void initializeSubscribers();
+	void initializePublishers();
 	// encorder ticks
-	void lwheel_cb(const std_msgs::Int32& msg_holder); 
-	void rwheel_cb(const std_msgs::Int32& msg_holder); 
+	void lwheel_cb(const std_msgs::Int32& msg_holder);
+	void rwheel_cb(const std_msgs::Int32& msg_holder);
 
 	// private data only available to member functions of this class
 	ros::NodeHandle nh_;	// we will need this. to pass btw constructor and main
@@ -68,7 +68,7 @@ private:
 
 	// double eff[2];
 	// __int32 is synonymous with type int. The __int64 type is synonymous with type long long.
-	int	encoder_ticks[2];
+	std::vector<int> encoder_ticks;
 	double N;	// ticks per rotation
 	std::size_t error;
 

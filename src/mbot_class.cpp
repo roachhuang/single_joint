@@ -8,8 +8,8 @@ MyRobot::MyRobot(ros::NodeHandle* nh) :nh_(*nh)
 	initializePublishers();
 
 	// initialize varables
-	encoder_ticks[2] = { 0 };
-	cmd[2] = { 0 }
+	// encoder_ticks[2] = { 0 };
+	// cmd[2] = { 0 }
 	error = 0;
 	nh_.param("/ROBOT/hardware_interface/loop_hz", loop_hz_, 0.1);
 	num_joints = joint_names_.size();
@@ -22,6 +22,7 @@ MyRobot::MyRobot(ros::NodeHandle* nh) :nh_(*nh)
 	pos.resize(num_joints_);
 	vel.resize(num_joints_);
 	eff.resize(num_joints_);
+	encoder_ticks.resize(num_joints_);
 }
 
 void MyRobot::initializeHardwareInterface() {
@@ -47,13 +48,18 @@ void MyRobot::initializeHardwareInterface() {
 
 		hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
 		effort_joint_interface.registerHandle(joint_handle);
+
+		pos[i] = 0.0;
+		vel[i] = 0.0;
+		eff[i] = 0.0;
+		cmd[i] = 0.0;
+		encoder_ticks[i] = 0;
 	}
 	// Register the JointEffortInterface containing the read/write joints with this robot's hardware_interface::RobotHW.
 	registerInterface(&jnt_state_interface);
 	registerInterface(&effort_joint_interface);
 	registerInterface(&jnt_pos_interface);
 	ROS_INFO("Done Initializing RoachBot Hardware Interface");
-
 
 	/*
 	hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
@@ -118,13 +124,13 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 	double wheel_angles[2];
 	double wheel_angle_deltas[2];
 
-	for (std::size_t i = 0; i < 2; i++) {
+	for (std::size_t i = 0; i < num_joints_; i++) {
 		wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
 		//double wheel_angle_normalized = normalizeAngle(wheel_angle);
 		wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
 		pos[i] += wheel_angle_deltas[i];
 		vel[i] = wheel_angle_deltas[i] / period.toSec();
-		eff[i] = 0;
+		eff[i] = 0.0;
 	}
 }
 void MyRobot::write(ros::Time time, ros::Duration period) {
