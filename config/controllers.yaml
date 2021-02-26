@@ -29,3 +29,5 @@ single_joint_actuator:
 
     wheel_separation : 0.15
     wheel_radius : 0.035
+    N: 806
+

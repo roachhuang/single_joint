@@ -9,9 +9,10 @@
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
 
-// #include <rospy_tutorials/Floats.h>
 // #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
+
+#define DEG_TO_RAD	0.0174532925	// pi/180
 
 // not that ros_control RobotHW needs velocity in rad/s
 class MyRobot : public hardware_interface::RobotHW
@@ -59,6 +60,7 @@ private:
 	double eff[2];
 	// __int32 is synonymous with type int. The __int64 type is synonymous with type long long.
 	int	encoder_ticks[2];
+	double N;	// ticks per rotation
 };	// a class definition requires a semicolon at the end of the definition.
 
 #endif
