@@ -11,13 +11,14 @@
 		<param name="port" value="/dev/ttyUSB0"/>
 		<param name="baud" value="57600"/>
 	</node>
-	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
+	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot_class" output="screen"/>
 	<node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/>
 	<node name="twist_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen"/>
 
 	<!-- controllers.yaml: velocity controller -->
 	<group>
 		<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+		<rosparam file="$(find diff_drive)/config/hardware.yaml" command="load"/>
 		<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
 		  args="
         	single_joint_actuator/joint_state_controller

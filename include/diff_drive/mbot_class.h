@@ -61,6 +61,8 @@ private:
 	// __int32 is synonymous with type int. The __int64 type is synonymous with type long long.
 	int	encoder_ticks[2];
 	double N;	// ticks per rotation
+	std::size_t error;
+
 };	// a class definition requires a semicolon at the end of the definition.
 
 #endif

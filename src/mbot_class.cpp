@@ -8,6 +8,9 @@ MyRobot::MyRobot(ros::NodeHandle* nh):nh_(*nh)
     initializePublishers();
 
     // initialize varables
+    encoder_ticks[2] = {0};
+    cmd[2] = {0}
+    error = 0;
 }
 
 void MyRobot::initializeHardwareInterface(){
@@ -16,8 +19,19 @@ void MyRobot::initializeHardwareInterface(){
     // E.g. parse the URDF for joint names & interfaces, then initialize them
     // Create a JointStateHandle for each joint and register them with the 
     // JointStateInterface.
-    // num_joints_ = joint_names_.size();
-    // ROS_INFO("Number of joints: %d", (int)num_joints_);
+    error += !nh_.getParam("/wheel_radius", wheel_radius);
+    error += !nh_.getParam("/N", N);
+    rosparam_shortcuts::shutdownIfError(name_, error);    
+
+    /*
+    error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
+    error += !rosparam_shortcuts::get(name_, nh_, "mobile_base_controller/wheel_radius", wheel_radius_);
+    error += !rosparam_shortcuts::get(name_, nh_, "mobile_base_controller/linear/x/max_velocity", max_velocity_);
+    rosparam_shortcuts::shutdownIfError(name_, error);
+    num_joints = joint_names_.size();
+    ROS_INFO("Number of joints: %d", (int)num_joints_);
+    */
+
     hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
     jnt_state_interface.registerHandle(state_handle_a);
     hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
@@ -59,8 +73,8 @@ void MyRobot::initializePublishers(){
 }
 double ticksToAngle(const int &ticks)
 {
-	// Convert number of encoder ticks to angle in radians
-	double angle = (double)ticks * (2.0 * M_PI / 542.0);
+	// Convert number of encoder ticks to angle in radians (360*ticks/N) * (pi/180)
+	double angle = (double)ticks * (2.0 * M_PI / N);
 	ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
 	return angle;
 }
