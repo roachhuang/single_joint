@@ -1,77 +1,102 @@
 #include <diff_drive/mbot_class.h>
 
-MyRobot::MyRobot(ros::NodeHandle* nh):nh_(*nh)
+MyRobot::MyRobot(ros::NodeHandle* nh) :nh_(*nh)
 {
-    ROS_INFO("in class constructor of MyRobot class");
-    initializeHardwareInterface();
-    initializeSubscribers();
-    initializePublishers();
+	ROS_INFO("in class constructor of MyRobot class");
+	initializeHardwareInterface();
+	initializeSubscribers();
+	initializePublishers();
 
-    // initialize varables
-    encoder_ticks[2] = {0};
-    cmd[2] = {0}
-    error = 0;
+	// initialize varables
+	encoder_ticks[2] = { 0 };
+	cmd[2] = { 0 }
+	error = 0;
+	nh_.param("/ROBOT/hardware_interface/loop_hz", loop_hz_, 0.1);
+	num_joints = joint_names_.size();
+	ROS_INFO("Number of joints: %d", (int)num_joints_);
+	// Get joint names
+	nh_.getParam("/ROBOT/hardware_interface/joints", joint_names_);
+	num_joints_ = joint_names_.size();
+
+	// Resize vectors
+	pos.resize(num_joints_);
+	vel.resize(num_joints_);
+	eff.resize(num_joints_);
 }
 
-void MyRobot::initializeHardwareInterface(){
-    // Initialization of the robot's resources (joints, sensors, actuators) and
-    // interfaces can be done here or inside init().
-    // E.g. parse the URDF for joint names & interfaces, then initialize them
-    // Create a JointStateHandle for each joint and register them with the 
-    // JointStateInterface.
-    error += !nh_.getParam("/wheel_radius", wheel_radius);
-    error += !nh_.getParam("/N", N);
-    rosparam_shortcuts::shutdownIfError(name_, error);    
+void MyRobot::initializeHardwareInterface() {
+	// Initialization of the robot's resources (joints, sensors, actuators) and
+	// interfaces can be done here or inside init().
+	// E.g. parse the URDF for joint names & interfaces, then initialize them
+	// Create a JointStateHandle for each joint and register them with the 
+	// JointStateInterface.
+	error += !nh_.getParam("/wheel_radius", wheel_radius);
+	error += !nh_.getParam("/N", N);
+	// rosparam_shortcuts::shutdownIfError(name_, error);    
 
-    /*
-    error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
-    error += !rosparam_shortcuts::get(name_, nh_, "mobile_base_controller/wheel_radius", wheel_radius_);
-    error += !rosparam_shortcuts::get(name_, nh_, "mobile_base_controller/linear/x/max_velocity", max_velocity_);
-    rosparam_shortcuts::shutdownIfError(name_, error);
-    num_joints = joint_names_.size();
-    ROS_INFO("Number of joints: %d", (int)num_joints_);
-    */
+	// Initialize Controller 
+	for (std::size_t i = 0; i < num_joints_; ++i) {
+		// Create a JointStateHandle for each joint and register them with the JointStateInterface.
+		hardware_interface::JointStateHandle joint_state_handle(joint_name_[i], &pos[i], &vel[i], &eff[i]);
+		jnt_state_interface.registerHandle(joint_state_handle);
 
-    hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
-    jnt_state_interface.registerHandle(state_handle_a);
-    hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
-    jnt_state_interface.registerHandle(state_handle_b);
-    // Register the JointStateInterface containing the read only joints
-    // with this robot's hardware_interface::RobotHW.
-    registerInterface(&jnt_state_interface);
+		// Create a JointHandle (read and write) for each controllable joint using the read-only joint handles
+		// within the JointStateInterface and register them with the JointPositionInterface.
+		hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
+		jnt_pos_interface.registerHandle(joint_handle);
 
-    // Create a JointHandle (read and write) for each controllable joint
-    // using the read-only joint handles within the JointStateInterface and 
-    // register them with the JointPositionInterface.
-    hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
-    jnt_pos_interface.registerHandle(pos_handle_a);
-    hardware_interface::JointHandle pos_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
-    jnt_pos_interface.registerHandle(pos_handle_b);
-    // Register the JointPositionInterface containing the read/write joints
-    // with this robot's hardware_interface::RobotHW.
-    registerInterface(&jnt_pos_interface);
+		hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
+		effort_joint_interface.registerHandle(joint_handle);
+	}
+	// Register the JointEffortInterface containing the read/write joints with this robot's hardware_interface::RobotHW.
+	registerInterface(&jnt_state_interface);
+	registerInterface(&effort_joint_interface);
+	registerInterface(&jnt_pos_interface);
+	ROS_INFO("Done Initializing RoachBot Hardware Interface");
 
-    hardware_interface::JointHandle effort_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
-    effort_joint_interface.registerHandle(effort_handle_a);	
-    hardware_interface::JointHandle effort_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
-    effort_joint_interface.registerHandle(effort_handle_b);
-    // Register the JointEffortInterface containing the read/write joints
-    // with this robot's hardware_interface::RobotHW.
-    registerInterface(&effort_joint_interface);
+
+	/*
+	hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
+	jnt_state_interface.registerHandle(state_handle_a);
+	hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
+	jnt_state_interface.registerHandle(state_handle_b);
+	// Register the JointStateInterface containing the read only joints
+	// with this robot's hardware_interface::RobotHW.
+	registerInterface(&jnt_state_interface);
+
+	// Create a JointHandle (read and write) for each controllable joint
+	// using the read-only joint handles within the JointStateInterface and
+	// register them with the JointPositionInterface.
+	hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
+	jnt_pos_interface.registerHandle(pos_handle_a);
+	hardware_interface::JointHandle pos_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
+	jnt_pos_interface.registerHandle(pos_handle_b);
+	// Register the JointPositionInterface containing the read/write joints
+	// with this robot's hardware_interface::RobotHW.
+	registerInterface(&jnt_pos_interface);
+
+	hardware_interface::JointHandle effort_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
+	effort_joint_interface.registerHandle(effort_handle_a);
+	hardware_interface::JointHandle effort_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
+	effort_joint_interface.registerHandle(effort_handle_b);
+	// Register the JointEffortInterface containing the read/write joints
+	// with this robot's hardware_interface::RobotHW.
+	registerInterface(&effort_joint_interface);
+	*/
 }
 
 // member helper function to set up subscribers
-void MyRobot::initializeSubscribers(){     
+void MyRobot::initializeSubscribers() {
 	lwheel_sub = nh_.subscribe("lwheel", 1, &MyRobot::lwheel_cb, this);
 	rwheel_sub = nh_.subscribe("rwheel", 1, &MyRobot::rwheel_cb, this);
 
 }
-void MyRobot::initializePublishers(){
-    // pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
+void MyRobot::initializePublishers() {
+	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
 	vl_pub = nh_.advertise<std_msgs::Int32>("/vl", 10);
 	vr_pub = nh_.advertise<std_msgs::Int32>("/vr", 10);
 }
-double ticksToAngle(const int &ticks)
+double ticksToAngle(const int& ticks)
 {
 	// Convert number of encoder ticks to angle in radians (360*ticks/N) * (pi/180)
 	double angle = (double)ticks * (2.0 * M_PI / N);
@@ -89,35 +114,35 @@ void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
 }
 
 void MyRobot::read(ros::Time time, ros::Duration period) {
-    ros::Duration elapsed_time = period;
-    double wheel_angles[2];
-    double wheel_angle_deltas[2];
+	ros::Duration elapsed_time = period;
+	double wheel_angles[2];
+	double wheel_angle_deltas[2];
 
-    for (std::size_t i = 0; i < 2; i++) {
-        wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
-        //double wheel_angle_normalized = normalizeAngle(wheel_angle);
-        wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
-        pos[i]+= wheel_angle_deltas[i];
-        vel[i]= wheel_angle_deltas[i] / period.toSec();
-        eff[i] = 0;
-    }			
-}	
+	for (std::size_t i = 0; i < 2; i++) {
+		wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
+		//double wheel_angle_normalized = normalizeAngle(wheel_angle);
+		wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
+		pos[i] += wheel_angle_deltas[i];
+		vel[i] = wheel_angle_deltas[i] / period.toSec();
+		eff[i] = 0;
+	}
+}
 void MyRobot::write(ros::Time time, ros::Duration period) {
-    std_msgs::Int32 vr;
-    std_msgs::Int32 vl;
+	std_msgs::Int32 vr;
+	std_msgs::Int32 vl;
 
-    // effortJointSaturationInterface.enforceLimits(elapsed_time);    		
-    ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
-    vr.data = cmd[0];
-    vr_pub.publish(vr);
+	// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
+	ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
+	vr.data = cmd[0];
+	vr_pub.publish(vr);
 
-    /*left_motor.data = output_left / max_velocity_ * 100.0;
-    right_motor.data = output_right / max_velocity_ * 100.0;		
-    */
-    // left motor
-    vl.data = cmd[1];
-    vl_pub.publish(vl);
-    // pub.publish(joints_pub);
+	/*left_motor.data = output_left / max_velocity_ * 100.0;
+	right_motor.data = output_right / max_velocity_ * 100.0;
+	*/
+	// left motor
+	vl.data = cmd[1];
+	vl_pub.publish(vl);
+	// pub.publish(joints_pub);
 }
 
 int main(int argc, char** argv)
@@ -129,8 +154,8 @@ int main(int argc, char** argv)
 	// the resources that are available. need to pass this to the class constructor
 	ros::NodeHandle nh;
 
-    ROS_INFO("main: instantiating an object of type MyRobotClass");
-	MyRobot roachbot=MyRobot(&nh);
+	ROS_INFO("main: instantiating an object of type MyRobotClass");
+	MyRobot roachbot = MyRobot(&nh);
 
 	// Create an instance of the controller manager and pass it the robot, 
 	// so that it can handle its resources.

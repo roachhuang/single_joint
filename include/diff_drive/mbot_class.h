@@ -51,13 +51,22 @@ private:
 	hardware_interface::PositionJointInterface jnt_pos_interface;
 	hardware_interface::EffortJointInterface effort_joint_interface;
 	// Data member array to store the controller commands which are sent to the 
-	// robot's resources (joints, actuators)
-	double cmd[2];
+	// robot's resources (joints, actuators)	
 
 	// Data member arrays to store the state of the robot's resources (joints, sensors)
-	double pos[2];
-	double vel[2];
-	double eff[2];
+	std::vector<double> pos;
+	std::vector<double> vel;
+	std::vector<double> eff;
+	std::vecotr<double> cmd;	// effort cmds
+	int num_joints_;
+	int joint_mode_; // position, velocity, or effort
+	std::vector<std::string> joint_names_;
+	std::vector<int> joint_types_;
+	std::vector<double> joint_lower_limits_;
+	std::vector<double> joint_upper_limits_;
+	std::vector<double> joint_effort_limits_;
+
+	// double eff[2];
 	// __int32 is synonymous with type int. The __int64 type is synonymous with type long long.
 	int	encoder_ticks[2];
 	double N;	// ticks per rotation
