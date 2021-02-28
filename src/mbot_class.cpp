@@ -1,28 +1,37 @@
 #include <diff_drive/mbot_class.h>
 
-MyRobot::MyRobot(ros::NodeHandle* nh) :nh_(*nh)
+MyRobot::MyRobot(ros::NodeHandle &nh) :nh_(nh)
 {
-	ROS_INFO("in class constructor of MyRobot class");
-	initializeHardwareInterface();
-	initializeSubscribers();
-	initializePublishers();
-
+	
 	// initialize varables
 	// encoder_ticks[2] = { 0 };
 	// cmd[2] = { 0 }
-	error = 0;
-	nh_.param("/ROBOT/hardware_interface/loop_hz", loop_hz_, 0.1);
-	num_joints = joint_names_.size();
-	ROS_INFO("Number of joints: %d", (int)num_joints_);
-	// Get joint names
-	nh_.getParam("/ROBOT/hardware_interface/joints", joint_names_);
-	num_joints_ = joint_names_.size();
+	// error = 0;
+	/* nh_.param("/ROBOT/hardware_interface/loop_hz", loop_hz_, 0.1);		// Get joint names
+	if (nh_.getParam("/ROBOT/hardware_interface/joints", joint_names_))
+	{
+		ROS_INFO("Number of joints: %d", (int)num_joints_);
+	}
+	else{
+		ROS_WARN("cannot get joint_name_!!!");
+	}
+	*/
+	joint_names_.resize(2);
+	joint_names_.push_back("joint1");
+	joint_names_.push_back("joint2");
+
+	num_joints_ = 2;// joint_names_.size();	
 
 	// Resize vectors
 	pos.resize(num_joints_);
 	vel.resize(num_joints_);
 	eff.resize(num_joints_);
+	// joint_names_.resize(num_joints_);
 	encoder_ticks.resize(num_joints_);
+	ROS_INFO("in class constructor of MyRobot class");
+	initializeHardwareInterface();
+	initializeSubscribers();
+	initializePublishers();
 }
 
 void MyRobot::initializeHardwareInterface() {
@@ -31,20 +40,20 @@ void MyRobot::initializeHardwareInterface() {
 	// E.g. parse the URDF for joint names & interfaces, then initialize them
 	// Create a JointStateHandle for each joint and register them with the 
 	// JointStateInterface.
-	error += !nh_.getParam("/wheel_radius", wheel_radius);
-	error += !nh_.getParam("/N", N);
+	// error += !nh_.getParam("/wheel_radius", wheel_radius);
+	// error += !nh_.getParam("/N", N);
 	// rosparam_shortcuts::shutdownIfError(name_, error);    
 
-	// Initialize Controller 
+	/* Initialize Controller 
 	for (std::size_t i = 0; i < num_joints_; ++i) {
 		// Create a JointStateHandle for each joint and register them with the JointStateInterface.
-		hardware_interface::JointStateHandle joint_state_handle(joint_name_[i], &pos[i], &vel[i], &eff[i]);
+		hardware_interface::JointStateHandle joint_state_handle(joint_names_[i], &pos[i], &vel[i], &eff[i]);
 		jnt_state_interface.registerHandle(joint_state_handle);
 
 		// Create a JointHandle (read and write) for each controllable joint using the read-only joint handles
 		// within the JointStateInterface and register them with the JointPositionInterface.
-		hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
-		jnt_pos_interface.registerHandle(joint_handle);
+		//hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
+		//jnt_pos_interface.registerHandle(joint_handle);
 
 		hardware_interface::JointHandle joint_handle(joint_state_handle, &cmd[i]);
 		effort_joint_interface.registerHandle(joint_handle);
@@ -58,10 +67,10 @@ void MyRobot::initializeHardwareInterface() {
 	// Register the JointEffortInterface containing the read/write joints with this robot's hardware_interface::RobotHW.
 	registerInterface(&jnt_state_interface);
 	registerInterface(&effort_joint_interface);
-	registerInterface(&jnt_pos_interface);
-	ROS_INFO("Done Initializing RoachBot Hardware Interface");
-
-	/*
+	// registerInterface(&jnt_pos_interface);
+	*/
+	
+	
 	hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
 	jnt_state_interface.registerHandle(state_handle_a);
 	hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
@@ -73,6 +82,7 @@ void MyRobot::initializeHardwareInterface() {
 	// Create a JointHandle (read and write) for each controllable joint
 	// using the read-only joint handles within the JointStateInterface and
 	// register them with the JointPositionInterface.
+	/*
 	hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
 	jnt_pos_interface.registerHandle(pos_handle_a);
 	hardware_interface::JointHandle pos_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
@@ -80,15 +90,18 @@ void MyRobot::initializeHardwareInterface() {
 	// Register the JointPositionInterface containing the read/write joints
 	// with this robot's hardware_interface::RobotHW.
 	registerInterface(&jnt_pos_interface);
+	*/
 
-	hardware_interface::JointHandle effort_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
+	hardware_interface::JointHandle effort_handle_a(state_handle_a, &cmd[0]);
+	ROS_INFO("Done Initializing eff Hardware Interface");	
 	effort_joint_interface.registerHandle(effort_handle_a);
+	
 	hardware_interface::JointHandle effort_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
 	effort_joint_interface.registerHandle(effort_handle_b);
 	// Register the JointEffortInterface containing the read/write joints
 	// with this robot's hardware_interface::RobotHW.
 	registerInterface(&effort_joint_interface);
-	*/
+		
 }
 
 // member helper function to set up subscribers
@@ -105,7 +118,7 @@ void MyRobot::initializePublishers() {
 double ticksToAngle(const int& ticks)
 {
 	// Convert number of encoder ticks to angle in radians (360*ticks/N) * (pi/180)
-	double angle = (double)ticks * (2.0 * M_PI / N);
+	double angle = (double)ticks * (2.0 * M_PI / 806.0);
 	ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
 	return angle;
 }
@@ -161,7 +174,7 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 
 	ROS_INFO("main: instantiating an object of type MyRobotClass");
-	MyRobot roachbot = MyRobot(&nh);
+	MyRobot roachbot = MyRobot(nh);
 
 	// Create an instance of the controller manager and pass it the robot, 
 	// so that it can handle its resources.
@@ -178,7 +191,7 @@ int main(int argc, char** argv)
 	while (ros::ok())
 	{
 		// Basic bookkeeping to get the system time in order to compute the control period.
-		const ros::Time     time = ros::Time::now();
+		const ros::Time time = ros::Time::now();
 		const ros::Duration period = time - prev_time;
 
 		// Execution of the actual control loop.

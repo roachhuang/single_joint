@@ -29,6 +29,11 @@
     rostopic pub /joint_states_from_arduion sensor_msgs/JointState '{position: [30], velocity: [40]}' --once
 
 
+roscd diff_drive
+rosparam load config/hardware.yaml
+rosparam list
+
+
  history | grep roslaunch
  history <number>
  # run previous cmd again

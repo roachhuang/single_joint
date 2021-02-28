@@ -9,6 +9,7 @@ project(diff_drive)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   controller_manager
+  hardware_interface  
   roscpp
   rospy
   std_msgs
@@ -111,7 +112,7 @@ add_service_files(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES ros_control_example
-  CATKIN_DEPENDS controller_manager roscpp rospy std_msgs std_srvs message_runtime
+  CATKIN_DEPENDS controller_manager hardware_interface mybot_class roscpp rospy std_msgs std_srvs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -127,9 +128,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/ros_control_example.cpp
-# )
+add_library(${PROJECT_NAME}
+   src/mbot_class.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
