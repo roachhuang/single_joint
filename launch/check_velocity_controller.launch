@@ -14,8 +14,9 @@
 	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
 	<!-- <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> -->
 	<node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen" launch-prefix="xterm -e"/>
+	<!--
 	<node name="odom" pkg="diff_drive" type="odom.py" output="screen"/>
-	
+	-->
 	<group>
 		<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
 		<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"

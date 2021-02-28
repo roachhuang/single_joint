@@ -6,6 +6,7 @@
 #include <hardware_interface/robot_hw.h>
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/Float32.h>
 
 // #include <rospy_tutorials/Floats.h>
 // #include <diff_drive/joint_state.h>
@@ -16,51 +17,15 @@ class MyRobot : public hardware_interface::RobotHW
 public:
 	// must be no return type for constructor
 	MyRobot(ros::NodeHandle& nh);
-	void read(ros::Time time, ros::Duration period) {
-		ros::Duration elapsed_time = period;
-		double wheel_angles[2];
-		double wheel_angle_deltas[2];
-
-		for (std::size_t i = 0; i < 2; i++) {
-			wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
-			//double wheel_angle_normalized = normalizeAngle(wheel_angle);
-			wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
-			pos[i]+= wheel_angle_deltas[i];
-			vel[i]= wheel_angle_deltas[i] / period.toSec();
-			eff[i] = 0;
-		}			
-	}
-
-	void write(ros::Time time, ros::Duration period) {
-		std_msgs::Int32 vr;
-		std_msgs::Int32 vl;
-
-		// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
-		ROS_INFO("PWM Cmd: [%3.2f, %3.2f]", cmd[0], cmd[1]);
-		vr.data = (int)cmd[0];
-		vr_pub.publish(vr);
-
-		/*left_motor.data = output_left / max_velocity_ * 100.0;
-        right_motor.data = output_right / max_velocity_ * 100.0;		
-		*/
-		// left motor
-		vl.data = (int)cmd[1];
-		vl_pub.publish(vl);
-		// pub.publish(joints_pub);
-	}	
-
-	double ticksToAngle(const int32_t& ticks) const
-	{
-		// Convert number of encoder ticks to angle in radians
-		double angle = (double)ticks * (2.0 * M_PI / N);
-		ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
-		return angle;
-	}
+	void write(ros::Time time, ros::Duration period);
+	void read(ros::Time time, ros::Duration period);
 
 private:	
 	void lwheel_cb(const std_msgs::Int32& msg);
 	void rwheel_cb(const std_msgs::Int32& msg);
 	bool init(ros::NodeHandle &nh);
+	float mapFloat(float x, float in_min, float in_max, float out_min, float out_max);
+	double ticksToAngle(const int32_t& ticks);
 	// hardware_interface::JointStateInterface gives read access to all joint values 
 	// without conflicting with other controllers.
 	hardware_interface::JointStateInterface jnt_state_interface;

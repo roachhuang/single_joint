@@ -12,11 +12,11 @@
     rosrun teleop_twist_keyboard teleop_twist_keyboard.py
     roslaunch robotican_lizi lizi.launch gazebo:=true
     -->
-    <!-- convert joint states to TF transforms for rviz, etc (we use odom.py instead)
+    <!-- convert joint states to TF transforms for rviz, etc (we use odom.py instead) -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
        respawn="false" output="screen">
     </node>
-    -->
+    
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ros_robotics)/urdf.rviz" required="true" />
     <!-- (required = "true") if rviz dies, entire roslaunch will be killed -->
 </launch>
