@@ -10,15 +10,16 @@
 // #include <rospy_tutorials/Floats.h>
 // #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
+#define N 20.0
 
 class MyRobot : public hardware_interface::RobotHW
 {
 public:
-	MyRobot(ros::NodeHandle &nh, urdf::Model *urdf_model) : name_("hardware_interface"), nh_(nh)
+	MyRobot(ros::NodeHandle &nh): nh_(nh) 
 	{	
 		ROS_INFO("Initializing roachbot Hardware Interface ...");
-		num_joints_ = joint_names_.size();
-		ROS_INFO("Number of joints: %d", (int)num_joints_);
+		// num_joints_ = joint_names_.size();
+		//ROS_INFO("Number of joints: %d", (int)num_joints_);
 
 		// Initialization of the robot's resources (joints, sensors, actuators) and
 		// interfaces can be done here or inside init().
@@ -53,19 +54,19 @@ public:
 		registerInterface(&effort_joint_interface);
 
 		// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-		vl_pub = nh_.advertise<std_msgs::Int32>("/vl", 10);
-		vr_pub = nh_.advertise<std_msgs::Int32>("/vr", 10);
-		nh_subscribe("/lwheel", 1, &lwheel_cb);
-		nh_subscribe("/rwheel", 1, &rwheel_cb);
-		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");
+		vl_pub = nh.advertise<std_msgs::Int32>("/vl", 5);
+		vr_pub = nh.advertise<std_msgs::Int32>("/vr", 10);
 
+		left_encoder_sub = nh.subscribe<std_msgs::Int32>("/lwheel", 1, &lwheel_cb);
+		right_encoder_sub = nh.subscribe<std_msgs::Int32>("/rwheel", 1, &rwheel_cb);
+		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");		
 		// return true;
 	}
 
-	bool init(ros::NodeHandle& root_nh, ros:NodeHandle & robot_hw_nh)
+	bool init(ros::NodeHandle& root_nh)
 	{
 		ROS_INFO("... Done Initializing DiffBot Hardware Interface");
-		reurn true;
+		return true;
 	}
 
 	void read(ros::Time time, ros::Duration period) {
@@ -74,9 +75,9 @@ public:
 		double wheel_angle_deltas[2];
 
 		for (std::size_t i = 0; i < 2; i++) {
-			wheel_angles[i] = ticksToAngle(encoder_ticks_[i]);
+			wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
 			//double wheel_angle_normalized = normalizeAngle(wheel_angle);
-			wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
+			wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
 			pos[i]+= wheel_angle_deltas[i];
 			vel[i]= wheel_angle_deltas[i] / period.toSec();
 			eff[i] = 0;
@@ -88,32 +89,32 @@ public:
 		std_msgs::Int32 vl;
 
 		// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
-		ROS_INFO("PWM Cmd: [%5.2f, %5.2f]", cmd[0], cmd[1]);
-		vr.data = cmd[0];
+		ROS_INFO("PWM Cmd: [%3.2f, %3.2f]", cmd[0], cmd[1]);
+		vr.data = (int)cmd[0];
 		vr_pub.publish(vr);
 
 		/*left_motor.data = output_left / max_velocity_ * 100.0;
         right_motor.data = output_right / max_velocity_ * 100.0;		
 		*/
 		// left motor
-		vl.data = cmd[1];
+		vl.data = (int)cmd[1];
 		vl_pub.publish(vl);
 		// pub.publish(joints_pub);
 	}
 protected:
 	void lwheel_cb(const std_msgs::Int32& msg) {
-		encoder_ticks[0] = msg->data;
-		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg->data);
+		encoder_ticks[0] = msg.data;
+		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
 	}
 	void rwheel_cb(const std_msgs::Int32& msg) {
-		encoder_ticks[1] = msg->data;
-		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg->data);
+		encoder_ticks[1] = msg.data;
+		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
 	}
 
 	double ticksToAngle(const int32_t& ticks) const
 	{
 		// Convert number of encoder ticks to angle in radians
-		double angle = (double)ticks * (2.0 * M_PI / 542.0);
+		double angle = (double)ticks * (2.0 * M_PI / N);
 		ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
 		return angle;
 	}
@@ -139,13 +140,16 @@ private:
 	double pos[2];
 	double vel[2];
 	double eff[2];
-	std_msgs::Int32	encoder_ticks[2];
+	int	encoder_ticks[2];
 
-	ros::Publisher pub;
+	ros::Publisher vr_pub;
+	ros::Publisher vl_pub;
+	ros::Subscriber left_encoder_sub;
+	ros::Subscriber right_encoder_sub;
+	
 	// ros::ServiceClient client;
 	// rospy_tutorials::Floats joints_pub;
 	// diff_drive::joint_state joint_read;	
-	
 };
 
 #endif

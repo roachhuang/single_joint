@@ -54,7 +54,8 @@ class TwistToMotors(object):
         # note that it pub to h/w interface and then h/w interface pub to arduion after pid
         # the topic name must match with yaml and launch files.
         self.pub_rmotor = rospy.Publisher(
-            '/single_joint_actuator/joint1_velocity_controller/command', Float64, queue_size=10)
+            # setpoints
+            '/single_joint_actuator/rwheel/command', Float64, queue_size=10)
         self.pub_lmotor = rospy.Publisher(
             '/single_joint_actuator/lwheel/command', Float64, queue_size=1)
 
@@ -98,7 +99,7 @@ class TwistToMotors(object):
         # m/s
         #self.right = 1.0*self.dx + self.dr*self.L/2.0
         #self.left = 1.0*self.dx - self.dr*self.L/2.0
-        # rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
+        rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
 
         # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s) 
         #self.right = interp(self.right, [-15, 15], [-255, 250])
