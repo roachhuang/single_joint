@@ -1,11 +1,10 @@
 #ifndef ROACHBOT_CLASS_H
 #define ROACHBOT_CLASS_H
 
-#include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
+#include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
 
@@ -19,9 +18,10 @@ class MyRobot : public hardware_interface::RobotHW
 {
 public:
 	// MyRobot(ros::NodeHandle& nh);
-	MyRobot(ros::NodeHandle* nh);
-	void read(ros::Time time, ros::Duration period);
+	MyRobot(ros::NodeHandle &nh);
+	void read(ros::Time time, ros::Duration period);	
 	void write(ros::Time time, ros::Duration period);
+	double N;	// ticks per rotation
 
 private:
 	// helper functions (member methods)
@@ -34,6 +34,9 @@ private:
 
 	// private data only available to member functions of this class
 	ros::NodeHandle nh_;	// we will need this. to pass btw constructor and main
+	ros::Timer my_control_loop_;
+    ros::Duration elapsed_time_;
+
 	ros::Publisher vr_pub;
 	ros::Publisher vl_pub;
 	ros::Subscriber lwheel_sub;
@@ -57,7 +60,8 @@ private:
 	std::vector<double> pos;
 	std::vector<double> vel;
 	std::vector<double> eff;
-	std::vecotr<double> cmd;	// effort cmds
+	// given setpoints
+	std::vector<double> cmd;	// effort cmds
 	int num_joints_;
 	int joint_mode_; // position, velocity, or effort
 	std::vector<std::string> joint_names_;
@@ -65,11 +69,15 @@ private:
 	std::vector<double> joint_lower_limits_;
 	std::vector<double> joint_upper_limits_;
 	std::vector<double> joint_effort_limits_;
-
+	std::vector<std::string> joint_names;
+	std::vector<double> joint_effort_command_;
+	// boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+   
 	// double eff[2];
 	// __int32 is synonymous with type int. The __int64 type is synonymous with type long long.
 	std::vector<int> encoder_ticks;
-	double N;	// ticks per rotation
+	
+	double wheel_radius;	
 	double loop_hz_;
 	std::size_t error;
 
