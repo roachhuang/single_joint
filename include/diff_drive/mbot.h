@@ -14,60 +14,8 @@
 class MyRobot : public hardware_interface::RobotHW
 {
 public:
-	MyRobot(ros::NodeHandle &nh)
-	{	
-		ROS_INFO("Initializing roachbot Hardware Interface ...");
-		// num_joints_ = joint_names_.size();
-		//ROS_INFO("Number of joints: %d", (int)num_joints_);
-
-		// Initialization of the robot's resources (joints, sensors, actuators) and
-		// interfaces can be done here or inside init().
-		// E.g. parse the URDF for joint names & interfaces, then initialize them
-		// Create a JointStateHandle for each joint and register them with the 
-		// JointStateInterface.
-		hardware_interface::JointStateHandle state_handle_a("joint1", &pos[0], &vel[0], &eff[0]);
-		jnt_state_interface.registerHandle(state_handle_a);
-		hardware_interface::JointStateHandle state_handle_b("joint2", &pos[1], &vel[1], &eff[1]);
-		jnt_state_interface.registerHandle(state_handle_b);
-		// Register the JointStateInterface containing the read only joints
-		// with this robot's hardware_interface::RobotHW.
-		registerInterface(&jnt_state_interface);
-
-		// Create a JointHandle (read and write) for each controllable joint
-		// using the read-only joint handles within the JointStateInterface and 
-		// register them with the JointPositionInterface.
-		hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
-		jnt_pos_interface.registerHandle(pos_handle_a);
-		hardware_interface::JointHandle pos_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
-		jnt_pos_interface.registerHandle(pos_handle_b);
-		// Register the JointPositionInterface containing the read/write joints
-		// with this robot's hardware_interface::RobotHW.
-		registerInterface(&jnt_pos_interface);
-
-		hardware_interface::JointHandle effort_handle_a(jnt_state_interface.getHandle("joint1"), &cmd[0]);
-		effort_joint_interface.registerHandle(effort_handle_a);	
-		hardware_interface::JointHandle effort_handle_b(jnt_state_interface.getHandle("joint2"), &cmd[1]);
-		effort_joint_interface.registerHandle(effort_handle_b);
-		// Register the JointEffortInterface containing the read/write joints
-		// with this robot's hardware_interface::RobotHW.
-		registerInterface(&effort_joint_interface);
-
-		// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-		vl_pub = nh.advertise<std_msgs::Int32>("/vl", 5);
-		vr_pub = nh.advertise<std_msgs::Int32>("/vr", 10);
-		// no "&"" is required in front of the callback func
-		left_encoder_sub = nh.subscribe<std_msgs::Int32>("/lwheel", 1, lwheel_cb);
-		right_encoder_sub = nh.subscribe<std_msgs::Int32>("/rwheel", 1, rwheel_cb);
-		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");		
-		// return true;
-	}
-
-	bool init(ros::NodeHandle& root_nh)
-	{
-		ROS_INFO("... Done Initializing DiffBot Hardware Interface");
-		return true;
-	}
-
+	// must be no return type for constructor
+	MyRobot(ros::NodeHandle& nh);
 	void read(ros::Time time, ros::Duration period) {
 		ros::Duration elapsed_time = period;
 		double wheel_angles[2];
@@ -99,16 +47,7 @@ public:
 		vl.data = (int)cmd[1];
 		vl_pub.publish(vl);
 		// pub.publish(joints_pub);
-	}
-
-	void lwheel_cb(const std_msgs::Int32& msg) {
-		encoder_ticks[0] = msg.data;
-		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
-	}
-	void rwheel_cb(const std_msgs::Int32& msg) {
-		encoder_ticks[1] = msg.data;
-		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
-	}
+	}	
 
 	double ticksToAngle(const int32_t& ticks) const
 	{
@@ -118,7 +57,10 @@ public:
 		return angle;
 	}
 
-private:
+private:	
+	void lwheel_cb(const std_msgs::Int32& msg);
+	void rwheel_cb(const std_msgs::Int32& msg);
+	bool init(ros::NodeHandle &nh);
 	// hardware_interface::JointStateInterface gives read access to all joint values 
 	// without conflicting with other controllers.
 	hardware_interface::JointStateInterface jnt_state_interface;
