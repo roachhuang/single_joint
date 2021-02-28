@@ -4,18 +4,17 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
-
+#include <ros/ros.h>
 #include <std_msgs/Int32.h>
 
 // #include <rospy_tutorials/Floats.h>
 // #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
-#define N 20.0
 
 class MyRobot : public hardware_interface::RobotHW
 {
 public:
-	MyRobot(ros::NodeHandle &nh): nh_(nh) 
+	MyRobot(ros::NodeHandle &nh)
 	{	
 		ROS_INFO("Initializing roachbot Hardware Interface ...");
 		// num_joints_ = joint_names_.size();
@@ -56,9 +55,9 @@ public:
 		// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
 		vl_pub = nh.advertise<std_msgs::Int32>("/vl", 5);
 		vr_pub = nh.advertise<std_msgs::Int32>("/vr", 10);
-
-		left_encoder_sub = nh.subscribe<std_msgs::Int32>("/lwheel", 1, &lwheel_cb);
-		right_encoder_sub = nh.subscribe<std_msgs::Int32>("/rwheel", 1, &rwheel_cb);
+		// no "&"" is required in front of the callback func
+		left_encoder_sub = nh.subscribe<std_msgs::Int32>("/lwheel", 1, lwheel_cb);
+		right_encoder_sub = nh.subscribe<std_msgs::Int32>("/rwheel", 1, rwheel_cb);
 		// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");		
 		// return true;
 	}
@@ -101,7 +100,7 @@ public:
 		vl_pub.publish(vl);
 		// pub.publish(joints_pub);
 	}
-protected:
+
 	void lwheel_cb(const std_msgs::Int32& msg) {
 		encoder_ticks[0] = msg.data;
 		ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
@@ -141,7 +140,7 @@ private:
 	double vel[2];
 	double eff[2];
 	int	encoder_ticks[2];
-
+	const double N = 20.0;
 	ros::Publisher vr_pub;
 	ros::Publisher vl_pub;
 	ros::Subscriber left_encoder_sub;
