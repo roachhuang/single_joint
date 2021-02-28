@@ -4,6 +4,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
+#include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
@@ -25,7 +26,7 @@ private:
 	void rwheel_cb(const std_msgs::Int32& msg);
 	bool init(ros::NodeHandle &nh);
 	float mapFloat(float x, float in_min, float in_max, float out_min, float out_max);
-	double ticksToAngle(const int32_t& ticks);
+	double ticksToRad(const int32_t& ticks);
 	// hardware_interface::JointStateInterface gives read access to all joint values 
 	// without conflicting with other controllers.
 	hardware_interface::JointStateInterface jnt_state_interface;

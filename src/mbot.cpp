@@ -1,7 +1,6 @@
 // #include <ros/ros.h>
 // h/w interface
 #include <diff_drive/mbot.h>
-#include <controller_manager/controller_manager.h>
 
 MyRobot::MyRobot(ros::NodeHandle &nh)
 {	
@@ -46,7 +45,6 @@ MyRobot::MyRobot(ros::NodeHandle &nh)
 	// return true;
 }
 
-
 void MyRobot::lwheel_cb(const std_msgs::Int32& msg) {
 	encoder_ticks[0] = msg.data;
 	//ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
@@ -71,28 +69,34 @@ float MyRobot::mapFloat(float x, float in_min, float in_max, float out_min, floa
 	return (x-in_min)*(out_max-out_min) / (in_max - in_min) + out_min;
 }	
 
-double MyRobot::ticksToAngle(const int32_t& ticks)
+double MyRobot::ticksToRad(const int32_t& ticks)
 {
 	// Convert number of encoder ticks to angle in radians
-	double angle = (double)ticks * (2.0 * M_PI / N);
+	int degree;
+	degree = (360 * ticks)/N;
+	degree %= 360;	
+	//double rad = (double)ticks * (2.0 * M_PI / N);
 	// ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
-	return angle;
+	return degree * M_PI/180;
 }
 
 void MyRobot::read(ros::Time time, ros::Duration period) {
 	ros::Duration elapsed_time = period;
 	double wheel_angles[2];
 	double wheel_angle_deltas[2];
+	double now_rad;
 
 	for (std::size_t i = 0; i < 2; i++) {
-		wheel_angles[i] = ticksToAngle(encoder_ticks[i]);
+		// wheel_angles[i] = ticksToRad(encoder_ticks[i]);
 		//double wheel_angle_normalized = normalizeAngle(wheel_angle);
-		wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
-		pos[i]+= wheel_angle_deltas[i];
-		vel[i]= wheel_angle_deltas[i] / period.toSec();
+		now_rad = ticksToRad(encoder_ticks[i]);
+		// wheel_angle_deltas[i] = wheel_angles[i] - pos[i];
+		// pos[i]+= wheel_angle_deltas[i];		
+		vel[i]= (now_rad - pos[i]) / period.toSec();
+		pos[i]= now_rad;
 		eff[i] = 0;
 	}
-	ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);			
+	ROS_INFO("pos/vel:: %.2f, %.2f, left: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);			
 }	
 
 void MyRobot::write(ros::Time time, ros::Duration period) {
