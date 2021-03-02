@@ -106,7 +106,7 @@ class DiffTf:
         self.dr = 0
         self.then = rospy.Time.now()
         
-        # subscriptions
+        # subscribe encoder ticks from arduino
         rospy.Subscriber("lwheel", Int32, self.lwheelCallback)
         rospy.Subscriber("rwheel", Int32, self.rwheelCallback)
         self.odomPub = rospy.Publisher("odom", Odometry,queue_size=10)
@@ -147,9 +147,7 @@ class DiffTf:
             th = ( d_right - d_left ) / self.base_width
             # calculate velocities
             self.dx = d / elapsed
-            self.dr = th / elapsed
-           
-
+            self.dr = th / elapsed          
              
             if (d != 0):
                 # calculate distance traveled in x and y
@@ -186,11 +184,8 @@ class DiffTf:
             odom.twist.twist.linear.x = self.dx
             odom.twist.twist.linear.y = 0
             odom.twist.twist.angular.z = self.dr
-            self.odomPub.publish(odom)
+            self.odomPub.publish(odom)          
             
-            
-
-
     #############################################################################
     def lwheelCallback(self, msg):
     #############################################################################
@@ -202,7 +197,6 @@ class DiffTf:
             self.lmult = self.lmult - 1
             
         self.left = 1.0 * (enc + self.lmult * (self.encoder_max - self.encoder_min)) 
-
 
         self.prev_lencoder = enc
         
@@ -217,7 +211,6 @@ class DiffTf:
             self.rmult = self.rmult - 1
             
         self.right = 1.0 * (enc + self.rmult * (self.encoder_max - self.encoder_min))
-
 
         self.prev_rencoder = enc
 
