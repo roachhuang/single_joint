@@ -57,14 +57,17 @@ void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
 bool MyRobot::init(ros::NodeHandle& nh)
 {
 	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-	vl_pub = nh.advertise<std_msgs::Float32>("/vl", 5);
+	vl_pub = nh.advertise<std_msgs::Float32>("/vl", 10);
 	vr_pub = nh.advertise<std_msgs::Float32>("/vr", 10);
+	client = nh.serviceClient<diff_drive::joint_state>("/read_joint_state");
+
 	// coz cb type is a class method https://wiki.ros.org/roscpp/Overview/Publishers%20and%20Subscribers
-	left_encoder_sub = nh.subscribe("/lwheel", 1, &MyRobot::lwheel_cb, this);
-	right_encoder_sub = nh.subscribe("/rwheel", 1, &MyRobot::rwheel_cb, this);
+	// left_encoder_sub = nh.subscribe("/lwheel", 1, &MyRobot::lwheel_cb, this);
+	// right_encoder_sub = nh.subscribe("/rwheel", 1, &MyRobot::rwheel_cb, this);
 	ROS_INFO("... Done Initializing DiffBot Hardware Interface");
 	return true;
 }
+
 float MyRobot::mapFloat(float x, float in_min, float in_max, float out_min, float out_max){
 	return (x-in_min)*(out_max-out_min) / (in_max - in_min) + out_min;
 }	
@@ -81,6 +84,7 @@ double MyRobot::ticksToRad(const int32_t& ticks)
 }
 
 void MyRobot::read(ros::Time time, ros::Duration period) {
+	/*
 	ros::Duration elapsed_time = period;
 	double wheel_angles[2];
 	double wheel_angle_deltas[2];
@@ -97,6 +101,23 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 		eff[i] = 0;
 	}
 	ROS_INFO("pos/vel:: %.2f, %.2f, left: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);			
+	*/
+	if(client.call(joint_read))
+	{
+	    pos[0] = joint_read.response.pos1;		
+	    vel[0] = joint_read.response.vel1;
+
+		pos[1] = joint_read.response.pos2;		
+	    vel[1] = joint_read.response.vel2;
+	    ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);
+	
+	// if more than one joint, get values for joint_position_2, joint_velocity_2,......	        
+	}
+	else
+	{
+	    pos[2] = {0};
+	    vel[2] = {0};		
+	}      
 }	
 
 void MyRobot::write(ros::Time time, ros::Duration period) {
@@ -109,13 +130,13 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 
 	// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
 	
-	vr.data = mapFloat(cmd[0], in_min, in_max, out_min, out_max);		
+	vr.data = cmd[0];		
 
 	/*left_motor.data = output_left / max_velocity_ * 100.0;
 	right_motor.data = output_right / max_velocity_ * 100.0;		
 	*/
 	// left motor
-	vl.data = mapFloat(cmd[1], in_min, in_max, out_min, out_max);
+	vl.data = cmd[1];
 
 	// ROS_INFO("PWM Cmd: [%d, %d]", (int)vr.data, (int)vl.data);
 

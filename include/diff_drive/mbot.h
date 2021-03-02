@@ -10,7 +10,7 @@
 #include <std_msgs/Float32.h>
 
 // #include <rospy_tutorials/Floats.h>
-// #include <diff_drive/joint_state.h>
+#include <diff_drive/joint_state.h>
 #include <angles/angles.h>
 
 class MyRobot : public hardware_interface::RobotHW
@@ -54,9 +54,9 @@ private:
 	ros::Subscriber left_encoder_sub;
 	ros::Subscriber right_encoder_sub;
 	
-	// ros::ServiceClient client;
+	ros::ServiceClient client;
 	// rospy_tutorials::Floats joints_pub;
-	// diff_drive::joint_state joint_read;	
+	diff_drive::joint_state joint_read;	
 };
 
 #endif
