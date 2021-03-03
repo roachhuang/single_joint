@@ -93,12 +93,12 @@ class TwistToMotors(object):
 
         # note that if setpoint=rad/s, than input(feedback unit) has to be also rad/s so pid will operate properly.
         #the unit is rad/s 
-        self.right = (2.0*self.dx + self.dr*self.L)/(2.0*self.R)
-        self.left = (2.0*self.dx - self.dr*self.L)/(2.0*self.R)
+        #self.right = (2.0*self.dx + self.dr*self.L)/(2.0*self.R)
+        #self.left = (2.0*self.dx - self.dr*self.L)/(2.0*self.R)
 
         # m/s
-        #self.right = 1.0*self.dx + self.dr*self.L/2.0
-        #self.left = 1.0*self.dx - self.dr*self.L/2.0
+        self.right = 1.0*self.dx + self.dr*self.L/2.0
+        self.left = 1.0*self.dx - self.dr*self.L/2.0
         rospy.loginfo("publishing: (%5.2f, %5.2f)", self.left, self.right)
 
         # mapping makes tunning pid coefficents easier (note: map radius/s instead of m/s) 
@@ -119,6 +119,8 @@ class TwistToMotors(object):
 
         self.pub_lmotor.publish(self.left)
         self.pub_rmotor.publish(self.right)
+        #self.pub_lmotor.publish(self.mapPwm(self.left, 40, 200))
+        #self.pub_rmotor.publish(self.mapPwm(self.right, 40, 200))
 
         self.ticks_since_target += 1
 
@@ -138,6 +140,9 @@ class TwistToMotors(object):
         self.pub_lmotor.publish(0.0)
         # makes sure robot receive the stop cmd prior to shutting down
         rospy.sleep(1)
+
+    def mapPwm(x, out_min, out_max):
+        x = x *(out_max - out_min)+out_min
 
 #############################################################
 #############################################################

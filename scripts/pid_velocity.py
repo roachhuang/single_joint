@@ -22,8 +22,8 @@
 import rospy
 import roslib
 
-from std_msgs.msg import Int16, Int64
-from std_msgs.msg import Float32
+from std_msgs.msg import Int16, Int32
+from std_msgs.msg import Float32, Float64
 from numpy import array
 
 ######################################################
@@ -62,7 +62,7 @@ class PidVelocity():
         self.rate = rospy.get_param('~rate', 30)
         self.rolling_pts = rospy.get_param('~rolling_pts', 2)
         self.timeout_ticks = rospy.get_param('~timeout_ticks', 4)
-        self.ticks_per_meter = rospy.get_param('ticks_meter', 14860)
+        self.ticks_per_meter = rospy.get_param('ticks_meter', 91)
         self.vel_threshold = rospy.get_param('~vel_threshold', 0.001)
         self.encoder_min = rospy.get_param('encoder_min', -2147483648)
         self.encoder_max = rospy.get_param('encoder_max', 2147483648)
@@ -77,9 +77,9 @@ class PidVelocity():
             self.nodename, self.Kp, self.Ki, self.Kd, self.ticks_per_meter))
 
         # subscribers/publishers
-        rospy.Subscriber("wheel", Int64, self.wheelCallback)
-        rospy.Subscriber("wheel_vtarget", Float32, self.targetCallback)
-        self.pub_motor = rospy.Publisher('motor_cmd', Float32, queue_size=10)
+        rospy.Subscriber("wheel", Int32, self.wheelCallback)
+        rospy.Subscriber("wheel_vtarget", Float64, self.targetCallback)
+        #self.pub_motor = rospy.Publisher('motor_cmd', Float32, queue_size=10)
         
         self.pub_vel = rospy.Publisher('wheel_vel', Float32, queue_size=10)
 
@@ -108,12 +108,12 @@ class PidVelocity():
         # only do the loop if we've recently recieved a target velocity message
         while not rospy.is_shutdown() and self.ticks_since_target < self.timeout_ticks:
             self.calcVelocity()
-            self.doPid()
-            self.pub_motor.publish(self.motor)
+            #self.doPid()
+            #self.pub_motor.publish(self.motor)
             self.r.sleep()
-            self.ticks_since_target += 1
-            if self.ticks_since_target == self.timeout_ticks:
-                self.pub_motor.publish(0)
+            #self.ticks_since_target += 1
+            #if self.ticks_since_target == self.timeout_ticks:
+            #    self.pub_motor.publish(0)
 
     #####################################################
     def calcVelocity(self):

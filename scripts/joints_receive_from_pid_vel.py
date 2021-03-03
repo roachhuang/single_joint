@@ -15,14 +15,20 @@ class Wheel_state(object):
         self.vel0=self.vel1=0       
         
         # sub from pid_velocity.py and create a service for h/w interface to call
-        rospy.Subscriber("/wheel_vel", Float32, self.joint1_callback, queue_size=10)
-        # rospy.Subscriber("/joint2_pos_vel", Floats, self.joint2_callback, queue_size=10)
+        rospy.Subscriber("/lwheel_vel", Float32, self.joint1_callback, queue_size=10)
+        rospy.Subscriber("/rwheel_vel", Float32, self.joint2_callback, queue_size=10)
 
     def joint1_callback(self, msg):        
         #self.pos[0]=msg.data[0]
         #self.vel[0]=msg.data[1]
-        self.pos0=msg.data[0]
-        self.vel0=msg.data[1]
+        #self.pos0=msg.data[0]
+        self.vel0=msg.data
+
+    def joint2_callback(self, msg):        
+        #self.pos[0]=msg.data[0]
+        #self.vel[0]=msg.data[1]
+        #self.pos1=msg.data[0]
+        self.vel1=msg.data
        
         #print "Pos: ", pos, "vel: ", vel
         #rospy.loginfo(rospy.get_caller_id() + "I heard %s", msg)

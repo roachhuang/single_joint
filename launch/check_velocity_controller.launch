@@ -11,9 +11,32 @@
 		<param name="port" value="/dev/ttyUSB0"/>
 		<param name="baud" value="57600"/>
 	</node>
-	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
-	<!-- <node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_arduino.py" output="screen"/> -->
+	
+	<node name="lpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
+      <remap from="wheel" to="lwheel"/>     
+      <remap from="wheel_vtarget" to="single_joint_actuator/lwheel/command"/>
+      <remap from="wheel_vel" to="lwheel_vel"/>
+      <rosparam param="out_min">-253</rosparam>
+      <rosparam param="out_max">253</rosparam>
+      <rosparam param="rate">30</rosparam>
+      <rosparam param="timeout_ticks">4</rosparam>
+      <rosparam param="rolling_pts">5</rosparam>
+  	</node>
+
+  	<node name="rpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
+      <remap from="wheel" to="rwheel"/>     
+      <remap from="wheel_vtarget" to="single_joint_actuator/rwheel/command"/> 
+      <remap from="wheel_vel" to="rwheel_vel"/>     
+      <rosparam param="out_min">-253</rosparam>
+      <rosparam param="out_max">253</rosparam>
+      <rosparam param="rate">30</rosparam>
+      <rosparam param="timeout_ticks">4</rosparam>
+      <rosparam param="rolling_pts">5</rosparam>
+ 	</node>
+
+	<node name="subscriber_py" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/> 
 	<node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen" launch-prefix="xterm -e"/>
+	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
 	<!--
 	<node name="odom" pkg="diff_drive" type="odom.py" output="screen"/>
 	-->
