@@ -5,30 +5,32 @@ import rospy
 from std_msgs.msg import Float32
 # <packagename>.srv
 from diff_drive.srv import joint_state, joint_stateResponse
-# from Float_array.srv import Floats_array, Float_arrayResponse, Float_arrayRequest
+# from Float_array.srv import Floats_array, Float_arrayResponse,
+# Float_arrayRequest
 class Wheel_state(object):
     def __init__(self):    
         rospy.init_node("wheel_states")
         nodename = rospy.get_name()
         rospy.loginfo("%s started" % nodename)
-        self.pos0=self.pos1=0        
-        self.vel0=self.vel1=0       
+        self.pos0 = self.pos1 = 0        
+        self.vel0 = self.vel1 = 0       
         
-        # sub from pid_velocity.py and create a service for h/w interface to call
-        rospy.Subscriber("/lwheel_vel", Float32, self.joint1_callback, queue_size=10)
-        rospy.Subscriber("/rwheel_vel", Float32, self.joint2_callback, queue_size=10)
+        # sub from pid_velocity.py and create a service for h/w interface to
+        # call
+        rospy.Subscriber("/rwheel_vel", Float32, self.joint1_callback, queue_size=10)
+        rospy.Subscriber("/lwheel_vel", Float32, self.joint2_callback, queue_size=10)
 
     def joint1_callback(self, msg):        
         #self.pos[0]=msg.data[0]
         #self.vel[0]=msg.data[1]
         #self.pos0=msg.data[0]
-        self.vel0=msg.data
+        self.vel0 = msg.data
 
     def joint2_callback(self, msg):        
         #self.pos[0]=msg.data[0]
         #self.vel[0]=msg.data[1]
         #self.pos1=msg.data[0]
-        self.vel1=msg.data
+        self.vel1 = msg.data
        
         #print "Pos: ", pos, "vel: ", vel
         #rospy.loginfo(rospy.get_caller_id() + "I heard %s", msg)
@@ -42,15 +44,16 @@ class Wheel_state(object):
     def my_server(self, req):
         global pos, vel
         res = joint_stateResponse() 
-        res.pos1=self.pos0
-        res.vel1=self.vel0
-        res.pos2=self.pos1
-        res.vel2=self.vel1
+        res.pos1 = self.pos0
+        res.vel1 = self.vel0
+        res.pos2 = self.pos1
+        res.vel2 = self.vel1
         res.success = True
         return res
 
     def main(self): 
-        # joint_state is the file name of srv; client is read method in h/w interface
+        # joint_state is the file name of srv; client is read method in h/w
+        # interface
         rospy.Service('read_joint_state', joint_state, self.my_server)
         rospy.loginfo('joint state service is available for h/w interface')
         # spin() simply keeps python from exiting until this node is stopped
