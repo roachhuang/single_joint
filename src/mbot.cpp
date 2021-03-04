@@ -46,12 +46,12 @@ MyRobot::MyRobot(ros::NodeHandle &nh)
 }
 
 void MyRobot::lwheel_cb(const std_msgs::Int32& msg) {
-	encoder_ticks[0] = msg.data;
+	encoder_ticks[1] = msg.data;
 	//ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
 }
 
 void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
-	encoder_ticks[1] = msg.data;
+	encoder_ticks[0] = msg.data;
 	// ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
 }
 bool MyRobot::init(ros::NodeHandle& nh)
@@ -109,7 +109,7 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 
 		pos[1] = joint_read.response.pos2;		
 	    vel[1] = joint_read.response.vel2;
-	    ROS_INFO("Current Pos: %.2f, %.2f, Vel: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);
+	    ROS_INFO("right: %.2f, %.2f \t left: %.2f, %2f",pos[0], vel[0], pos[1], vel[1]);
 	
 	// if more than one joint, get values for joint_position_2, joint_velocity_2,......	        
 	}
@@ -129,7 +129,7 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 	const float out_max=200.0;
 
 	// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
-	
+	// cmd[0] is registered as joint1
 	vr.data = cmd[0];		
 
 	/*left_motor.data = output_left / max_velocity_ * 100.0;
@@ -141,8 +141,9 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 	// ROS_INFO("PWM Cmd: [%d, %d]", (int)vr.data, (int)vl.data);
 
 	// to do: publish array of data 
-	vr_pub.publish(vr);
 	vl_pub.publish(vl);
+	vr_pub.publish(vr);
+
 	// pub.publish(joints_pub);
 }		
 
