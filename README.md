@@ -1,4 +1,7 @@
 
+    pid for uno: lwheel: 80, 0.007, 0.0
+    rwheel: 110, 0.0032, 0.0
+
     note that we cannot run position controller and velocity controller at the same time, so we create two launch files.
     
     rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0

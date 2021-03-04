@@ -57,8 +57,8 @@ void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
 bool MyRobot::init(ros::NodeHandle& nh)
 {
 	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-	vl_pub = nh.advertise<std_msgs::Float32>("/vl", 10);
-	vr_pub = nh.advertise<std_msgs::Float32>("/vr", 10);
+	motor_cmd_pub = nh.advertise<rospy_tutorials::Floats>("motor_cmd", 10);
+	// vr_pub = nh.advertise<std_msgs::Float32>("/vr", 10);
 	client = nh.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
 	// coz cb type is a class method https://wiki.ros.org/roscpp/Overview/Publishers%20and%20Subscribers
@@ -121,8 +121,10 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 }	
 
 void MyRobot::write(ros::Time time, ros::Duration period) {
-	std_msgs::Float32 vr;
-	std_msgs::Float32 vl;
+	//std_msgs::Float32 vr;
+	//std_msgs::Float32 vl;
+	rospy_tutorials::Floats motor_cmd;
+
 	const float in_min= -0.5;	// rad/s
 	const float in_max= 0.5;
 	const float out_min=48.0;		// pwm
@@ -130,21 +132,21 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 
 	// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
 	// cmd[0] is registered as joint1
-	vr.data = cmd[0];		
-
+	motor_cmd.data.clear();
+	motor_cmd.data.push_back(cmd[0]);
 	/*left_motor.data = output_left / max_velocity_ * 100.0;
 	right_motor.data = output_right / max_velocity_ * 100.0;		
 	*/
 	// left motor
-	vl.data = cmd[1];
+	motor_cmd.data.push_back(cmd[1]);
 
 	// ROS_INFO("PWM Cmd: [%d, %d]", (int)vr.data, (int)vl.data);
 
 	// to do: publish array of data 
-	vl_pub.publish(vl);
-	vr_pub.publish(vr);
+	//vl_pub.publish(vl);
+	//vr_pub.publish(vr);
 
-	// pub.publish(joints_pub);
+	motor_cmd_pub.publish(motor_cmd);
 }		
 
 int main(int argc, char** argv)

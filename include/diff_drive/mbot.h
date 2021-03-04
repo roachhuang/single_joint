@@ -9,7 +9,7 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
 
-// #include <rospy_tutorials/Floats.h>
+#include <rospy_tutorials/Floats.h>
 #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
 
@@ -43,15 +43,16 @@ private:
 	// robot's resources (joints, actuators)
 	// 0->joint1 (right); 1->joint2 (left)
 	double cmd[2];
-
+		
 	// Data member arrays to store the state of the robot's resources (joints, sensors)
 	double pos[2];
 	double vel[2];
 	double eff[2];
 	int	encoder_ticks[2];
 	const double N = 20.0;
-	ros::Publisher vr_pub;
-	ros::Publisher vl_pub;
+	//ros::Publisher vr_pub;
+	//ros::Publisher vl_pub;
+	ros::Publisher motor_cmd_pub;
 	ros::Subscriber left_encoder_sub;
 	ros::Subscriber right_encoder_sub;
 

@@ -1,6 +1,6 @@
 
 #include <ros.h>
-// #include <rospy_tutorials/Floats.h>
+#include <rospy_tutorials/Floats.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
 
@@ -41,16 +41,17 @@ float vr, vl;
 
 volatile int32_t right_ticks, left_ticks;
 
-void get_vr_cb(const std_msgs::Float32& cmd_msg) {
-  vr = cmd_msg.data;
+//void get_vr_cb(const std_msgs::Float32& cmd_msg) {
+//  vr = cmd_msg.data;
+//}
+
+void get_motor_cmd_cb(const rospy_tutorials::Floats &cmd_msg) {
+  vr = cmd_msg.data[0];
+  vl = cmd_msg.data[1];  
 }
 
-void get_vl_cb(const std_msgs::Float32& cmd_msg) {
-  vl = cmd_msg.data;
-}
-
-ros::Subscriber<std_msgs::Float32> vr_sub("vr", &get_vr_cb);
-ros::Subscriber<std_msgs::Float32> vl_sub("vl", &get_vl_cb);
+ros::Subscriber<rospy_tutorials::Floats> motor_cmd_sub("motor_cmd", &get_motor_cmd_cb);
+// ros::Subscriber<std_msgs::Float32> vl_sub("vl", &get_vl_cb);
 
 std_msgs::Int32 int_ticksLeft;
 std_msgs::Int32 int_ticksRight;
@@ -60,8 +61,8 @@ ros::Publisher right_ticks_pub("rwheel", &int_ticksRight);
 void setup() {
   nh.initNode();
   // nh.loginfo("roachbot wheel encoders:");
-  nh.subscribe(vl_sub);
-  nh.subscribe(vr_sub);
+  // nh.subscribe(vl_sub);
+  nh.subscribe(motor_cmd_sub);
   nh.advertise(left_ticks_pub);
   nh.advertise(right_ticks_pub);
 
@@ -101,7 +102,7 @@ void loop() {
   right_ticks_pub.publish(&int_ticksRight);
 
   nh.spinOnce();
-  delay(10);
+  // delay(10);
 }
 
 void lEncoder()  {
