@@ -16,6 +16,7 @@
       <remap from="wheel" to="lwheel"/>     
       <remap from="wheel_vtarget" to="single_joint_actuator/lwheel/command"/>
       <remap from="wheel_vel" to="lwheel_vel"/>
+      <remap from="motor_cmd" to="vl"/>
       <rosparam param="out_min">-253</rosparam>
       <rosparam param="out_max">253</rosparam>
       <rosparam param="rate">30</rosparam>
@@ -26,7 +27,8 @@
   	<node name="rpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
       <remap from="wheel" to="rwheel"/>     
       <remap from="wheel_vtarget" to="single_joint_actuator/rwheel/command"/> 
-      <remap from="wheel_vel" to="rwheel_vel"/>     
+      <remap from="wheel_vel" to="rwheel_vel"/>
+	  <remap from="motor_cmd" to="vr"/>
       <rosparam param="out_min">-253</rosparam>
       <rosparam param="out_max">253</rosparam>
       <rosparam param="rate">30</rosparam>

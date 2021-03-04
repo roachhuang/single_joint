@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classhandle__cmd__vel_1_1Kinematics.html" title="handle_cmd_vel.Kinematics" alt="" coords="121,5,307,32"/>
+<area shape="rect" id="node3" href="$classjoints__receive__from__arduino_1_1Wheel__state.html" title="joints_receive_from\l_arduino.Wheel_state" alt="" coords="140,57,288,98"/>
+<area shape="rect" id="node4" href="$classtwist__to__motors_1_1TwistToMotors.html" title="twist_to_motors.TwistToMotors" alt="" coords="111,123,317,149"/>
+</map>

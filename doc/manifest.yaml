@@ -1,0 +1,23 @@
+actions: []
+authors: ''
+brief: ''
+bugtracker: ''
+depends:
+- std_srvs
+- roscpp
+- controller_manager
+- message_runtime
+- std_msgs
+- rospy
+- message_generation
+- catkin
+description: The ros_control_example package
+license: TODO
+maintainers: ubuntu <ubuntu@todo.todo>
+msgs:
+- num
+package_type: package
+repo_url: ''
+srvs:
+- joint_state
+url: ''

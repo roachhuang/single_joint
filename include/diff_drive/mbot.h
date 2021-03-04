@@ -21,10 +21,10 @@ public:
 	void write(ros::Time time, ros::Duration period);
 	void read(ros::Time time, ros::Duration period);
 
-private:	
+private:
 	void lwheel_cb(const std_msgs::Int32& msg);
 	void rwheel_cb(const std_msgs::Int32& msg);
-	bool init(ros::NodeHandle &nh);
+	bool init(ros::NodeHandle& nh);
 	float mapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 	double ticksToRad(const int32_t& ticks);
 	// hardware_interface::JointStateInterface gives read access to all joint values 
@@ -41,6 +41,7 @@ private:
 
 	// Data member array to store the controller commands which are sent to the 
 	// robot's resources (joints, actuators)
+	// 0->joint1 (right); 1->joint2 (left)
 	double cmd[2];
 
 	// Data member arrays to store the state of the robot's resources (joints, sensors)
@@ -53,10 +54,10 @@ private:
 	ros::Publisher vl_pub;
 	ros::Subscriber left_encoder_sub;
 	ros::Subscriber right_encoder_sub;
-	
+
 	ros::ServiceClient client;
 	// rospy_tutorials::Floats joints_pub;
-	diff_drive::joint_state joint_read;	
+	diff_drive::joint_state joint_read;
 };
 
 #endif
