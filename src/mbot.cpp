@@ -120,6 +120,7 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 	}      
 }	
 
+// to do: stop motor if no push from twist_to_motor, otherwise pid goes crazy
 void MyRobot::write(ros::Time time, ros::Duration period) {
 	//std_msgs::Float32 vr;
 	//std_msgs::Float32 vl;

@@ -13,8 +13,7 @@ class Wheel_state(object):
         nodename = rospy.get_name()
         rospy.loginfo("%s started" % nodename)
         self.pos0 = self.pos1 = 0        
-        self.vel0 = self.vel1 = 0       
-        
+        self.vel0 = self.vel1 = 0
 
         # sub from pid_velocity.py and create a service for h/w interface to call
         # note that joint1 maps to rwheel, cmd[0], vel[0]

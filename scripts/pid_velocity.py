@@ -22,7 +22,7 @@
 import rospy
 import roslib
 
-from std_msgs.msg import Int16, Int32
+from std_msgs.msg import Int32
 from std_msgs.msg import Float32, Float64
 from numpy import array
 
@@ -84,7 +84,7 @@ class PidVelocity():
     def spin(self):
     #####################################################
         self.r = rospy.Rate(self.rate)
-        self.then = rospy.Time.now()
+        # self.then = rospy.Time.now()
         self.ticks_since_target = self.timeout_ticks
         self.wheel_prev = self.wheel_latest
         self.then = rospy.Time.now()
@@ -111,6 +111,7 @@ class PidVelocity():
             self.ticks_since_target += 1
             if self.ticks_since_target == self.timeout_ticks:
                 self.pub_motor.publish(0)
+                #self.pub_vel.publish(0)                
 
     #####################################################
     def calcVelocity(self):
