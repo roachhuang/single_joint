@@ -76,7 +76,7 @@ class PidVelocity():
         # subscribers/publishers
         rospy.Subscriber("wheel", Int32, self.wheelCallback)
         rospy.Subscriber("wheel_vtarget", Float64, self.targetCallback)
-        self.pub_motor = rospy.Publisher('motor_cmd', Float32, queue_size=10)
+        self.pub_motor = rospy.Publisher('wheel_vtarget', Float64, queue_size=10)
         
         self.pub_vel = rospy.Publisher('wheel_vel', Float32, queue_size=10)
 
@@ -110,7 +110,7 @@ class PidVelocity():
             self.r.sleep()
             self.ticks_since_target += 1
             if self.ticks_since_target == self.timeout_ticks:
-                self.pub_motor.publish(0)
+                self.pub_motor.publish(0.0)
                 #self.pub_vel.publish(0)                
 
     #####################################################

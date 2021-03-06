@@ -1,4 +1,11 @@
 
+    to do:
+      see how to reset cmd[] if no twist cmd 
+      figure out if nh_ is really needed
+      pub pos in read method. if have time (not important)
+      tt motor is unstable, so just tune pid for a certain sweetspot speed.      
+      to understand rates and queue size in each node to see if they are properly set.
+
     pid for uno: lwheel: 80, 0.007, 0.0
     rwheel: 110, 0.0032, 0.0
 

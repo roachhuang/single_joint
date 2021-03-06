@@ -2,7 +2,8 @@
 // h/w interface
 #include <diff_drive/mbot.h>
 
-MyRobot::MyRobot(ros::NodeHandle &nh)
+// to do: figure out if really need nh_
+MyRobot::MyRobot(ros::NodeHandle &nh) :nh_(nh)
 {	
 	ROS_INFO("Initializing roachbot Hardware Interface ...");
 	// num_joints_ = joint_names_.size();
@@ -40,7 +41,7 @@ MyRobot::MyRobot(ros::NodeHandle &nh)
 	// with this robot's hardware_interface::RobotHW.
 	registerInterface(&effort_joint_interface);
 
-	init(nh);
+	init(nh_);
 	// client = nh_.serviceClient<diff_drive::joint_state>("/read_joint_state");		
 	// return true;
 }

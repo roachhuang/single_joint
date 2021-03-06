@@ -59,6 +59,7 @@ private:
 	ros::ServiceClient client;
 	// rospy_tutorials::Floats joints_pub;
 	diff_drive::joint_state joint_read;
+	ros::NodeHandle nh_;
 };
 
 #endif
