@@ -33,3 +33,4 @@ single_joint_actuator:
 
     wheel_separation : 0.15
     wheel_radius : 0.035
+    ticks_meter : 3665 # 1/(2 x pi x wheel_radius) * N

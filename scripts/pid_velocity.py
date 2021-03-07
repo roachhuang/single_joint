@@ -62,7 +62,11 @@ class PidVelocity():
         self.rate = rospy.get_param('~rate', 30)
         self.rolling_pts = rospy.get_param('~rolling_pts', 2)
         self.timeout_ticks = rospy.get_param('~timeout_ticks', 4)
-        self.ticks_per_meter = rospy.get_param('ticks_meter', 91)
+        # tt motor 20 ppr
+        #self.ticks_per_meter = rospy.get_param('ticks_meter', 91)
+        # 806 ppr
+        self.ticks_per_meter = rospy.get_param('ticks_meter', 3665)
+
         self.vel_threshold = rospy.get_param('~vel_threshold', 0.001)
         self.encoder_min = rospy.get_param('encoder_min', -2147483648)
         self.encoder_max = rospy.get_param('encoder_max', 2147483648)
