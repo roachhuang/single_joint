@@ -142,12 +142,13 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 	// left motor
 	motor_cmd.data.push_back(cmd[1]);
 
-	ROS_INFO("PWM Cmd: [right: %f \t left: %f]", cmd[0], cmd[1]);
+	// ROS_INFO("PWM Cmd: [right: %f \t left: %f]", cmd[0], cmd[1]);
 
 	// to do: publish array of data 
 	//vl_pub.publish(vl);
 	//vr_pub.publish(vr);
-
+	
+	// output for PID
 	motor_cmd_pub.publish(motor_cmd);
 }		
 
