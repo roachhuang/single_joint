@@ -6,6 +6,8 @@
 
 	<include file="$(find diff_drive)/launch/view_robot.launch" />
 	<rosparam param="wheel_radius">0.035</rosparam>
+  <rosparam param="wheel_separation">0.15</rosparam>  
+  <rosparam param="ticks_meter">3665</rosparam>
 
 	<node pkg="rosserial_python" type="serial_node.py" name="serial_node" launch-prefix="xterm -e">
 		<param name="port" value="/dev/ttyUSB0"/>
@@ -39,10 +41,13 @@
 	<node name="joint_vel_service" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/> 
 	<node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen" launch-prefix="xterm -e">
     <remap from="rwheel_vtarget" to="/single_joint_actuator/rwheel/command"/>
-    <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>
+    <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>    
   </node>
 	<node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>	
-	<node name="diff_tf" pkg="diff_drive" type="diff_tf.py" output="screen"/>
+	<node name="diff_tf" pkg="diff_drive" type="diff_tf.py" output="screen">
+    <rosparam param="base_frame_id">base_link</rosparam>
+    <rosparam param="odom_frame_id">odom</rosparam>
+  </node>
 	
 	<group>
 		<rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
