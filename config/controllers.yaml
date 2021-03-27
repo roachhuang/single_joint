@@ -17,7 +17,7 @@ single_joint_actuator:
       joint: joint1
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
       #pid: {p: 1.7, i: 0.0006, d: 0, i_clamp_min: -100.0, i_clamp_max: 100, antiwindup: True}
-      pid: {p: 0, i: 0.0, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
+      pid: {p: 200, i: 0.1, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
       #pid: {p: 12.5, i: 3.65, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
@@ -27,7 +27,7 @@ single_joint_actuator:
       joint: joint2
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
       #pid: {p: 1.1, i: 0.00162, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
-      pid: {p: 6.5, i: 0.00, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
+      pid: {p: 200, i: 0.1, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
       #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 

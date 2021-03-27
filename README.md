@@ -6,6 +6,10 @@
       tt motor is unstable, so just tune pid for a certain sweetspot speed.      
       to understand rates and queue size in each node to see if they are properly set.
       tick_meter param in 2 file - pid_velocity and diff_tf. make the param in rosparm
+      fix serial_node wrong checksum issue
+
+    
+    mega 2560 int pins: 2, 3, 21, 20, 19, 18 (INT0~5)
 
     pid for uno: lwheel: 80, 0.007, 0.0
     rwheel: 110, 0.0032, 0.0
