@@ -1,10 +1,12 @@
 
+
 #include <ros.h>
 #include <rospy_tutorials/Floats.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
+#include <TimerOne.h>
 
-#define uno
+// #define uno
 #ifdef uno
 // pid 4, 0.007 to begin with
 // left
@@ -18,18 +20,30 @@
 #define IN3 12  // yellow
 #define IN4 13  // green
 #define N 20
+// MEGA 2560
+/*  
+ *   JGB37-520
+ *   red: motor+
+ *   black: encoder power-
+ *   yellow: signal line (motor pulse 11 pulses)
+ *   green: signal line (resolution 11* reductiion ratio(90)=resolution)
+ *   blue: encoder power+ (3.3v or 5v)
+ *   white: motor power-
+ */
+
 #else
 #define ENCODER_PINA1 2                       // Quadrature encoder A pin
 #define ENCODER_PINB1 5                       // Quadrature encoder B pin 
 #define ENA 6
-#define IN1 7 // right motor
+#define IN1 7 // left motor
 #define IN2 8
 
 #define ENCODER_PINA2  3
+#define ENCODER_PINB2  4
 #define ENB 9
-#define IN3 10 // left motor
+#define IN3 10 // right motor
 #define IN4 11
-#define N 806
+#define N 990
 #endif
 
 // ticks per revolution, this has to be tested by manually turn the motor 360 degree to get tick number.
@@ -83,10 +97,11 @@ void setup() {
   pinMode(IN4, OUTPUT);
 
   right_ticks = left_ticks = vl = vr = 0;
-
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), lEncoder, FALLING);               // update encoder position
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), rEncoder, FALLING);
-  TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
+  Timer1.initialize(100000); // 200ms
+  Timer1.attachInterrupt(isrTimerOne);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), lEncoder, RISING);               // update encoder position
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), rEncoder, RISING);
+  // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
 }
 
 void loop() {
@@ -102,14 +117,14 @@ void loop() {
   right_ticks_pub.publish(&int_ticksRight);
 
   nh.spinOnce();
-  // delay(10);
+  delay(1); // pub at 100hz (10ms)
 }
 
 void lEncoder()  {
 #ifdef uno
   left_ticks++;
 #else
-  // right_ticks += digitalRead(ENCODER_PINB2) ? 1 : -1;
+  left_ticks -= digitalRead(ENCODER_PINB1) ? -1 : +1;
 #endif
 }
 
@@ -118,8 +133,14 @@ void rEncoder()  {
   right_ticks++;
 #else
   // CW->-1; CCW->+1
-  right_ticks += digitalRead(ENCODER_PINB1) ? 1 : -1;
+  right_ticks += digitalRead(ENCODER_PINB2) ? -1 : +1;
 #endif
+}
+
+void isrTimerOne(){  
+  nh.spinOnce();
+  //left_ticks_pub.publish(&int_ticksLeft);
+  //right_ticks_pub.publish(&int_ticksRight);
 }
 
 void lpwmOut(float out) {
