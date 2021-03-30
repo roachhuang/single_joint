@@ -9,7 +9,8 @@
   <rosparam param="wheel_separation">0.15</rosparam>  
   <rosparam param="ticks_meter">3665</rosparam>
 
-	<node pkg="rosserial_python" type="serial_node.py" name="serial_node" launch-prefix="xterm -e">
+	<!-- <node pkg="rosserial_python" type="serial_node.py" name="serial_node" launch-prefix="xterm -e"> -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
 		<param name="port" value="/dev/ttyUSB0"/>
 		<param name="baud" value="57600"/>
 	</node>
@@ -39,7 +40,7 @@
  	</node>
 
 	<node name="joint_vel_service" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/> 
-	<node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen" launch-prefix="xterm -e">
+	<node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen">
     <remap from="rwheel_vtarget" to="/single_joint_actuator/rwheel/command"/>
     <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>    
   </node>
