@@ -3,7 +3,7 @@
     <arg name="model" default="dd_robot6.urdf"/>
     <arg name="gui" default="False" />
     <!-- set these parameters on Parameter Server -->
-    <param name="robot_description" textfile="$(find ros_robotics)/urdf/$(arg model)" />
+    <param name="robot_description" textfile="$(find diff_driver)/urdf/$(arg model)" />
     <param name="use_gui" value="$(arg gui)"/>
 
     <!--
