@@ -5,8 +5,7 @@
     <!-- set these parameters on Parameter Server -->
     <param name="robot_description" textfile="$(find ros_robotics)/urdf/$(arg model)" />
     <param name="use_gui" value="$(arg gui)"/>
-    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
-    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
     <!--
     roslaunch turtlebot_teleop keyboard_teleop.launch
     rosrun teleop_twist_keyboard teleop_twist_keyboard.py
@@ -16,7 +15,11 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
        respawn="false" output="screen">
     </node>
-    
+
+    <!--
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ros_robotics)/urdf.rviz" required="true" />
+    -->
     <!-- (required = "true") if rviz dies, entire roslaunch will be killed -->
 </launch>
