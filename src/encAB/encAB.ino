@@ -1,7 +1,8 @@
 
 
 #include <ros.h>
-#include <rospy_tutorials/Floats.h>
+// #include <rospy_tutorials/Floats.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
 #include <TimerOne.h>
@@ -59,12 +60,13 @@ volatile int32_t right_ticks, left_ticks;
 //  vr = cmd_msg.data;
 //}
 
-void get_motor_cmd_cb(const rospy_tutorials::Floats &cmd_msg) {
+// void get_motor_cmd_cb(const rospy_tutorials::Floats &cmd_msg) {
+void get_motor_cmd_cb(const std_msgs::Float32MultiArray &cmd_msg) {
   vr = cmd_msg.data[0];
   vl = cmd_msg.data[1];  
 }
 
-ros::Subscriber<rospy_tutorials::Floats> motor_cmd_sub("motor_cmd", &get_motor_cmd_cb);
+ros::Subscriber<std_msgs::Float32MultiArray> motor_cmd_sub("motor_cmd", &get_motor_cmd_cb);
 // ros::Subscriber<std_msgs::Float32> vl_sub("vl", &get_vl_cb);
 
 std_msgs::Int32 int_ticksLeft;
