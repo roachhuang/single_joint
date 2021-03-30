@@ -10,6 +10,7 @@
 #include <std_msgs/Float32.h>
 
 #include <rospy_tutorials/Floats.h>
+#include "std_msgs/Float32MultiArray.h"
 #include <diff_drive/joint_state.h>
 #include <angles/angles.h>
 
@@ -49,12 +50,16 @@ private:
 	double vel[2];
 	double eff[2];
 	int	encoder_ticks[2];
-	const double N = 20.0;
+	// const double N = 20.0;
+	const int num_joints = 2;
+
 	//ros::Publisher vr_pub;
 	//ros::Publisher vl_pub;
 	ros::Publisher motor_cmd_pub;
 	ros::Subscriber left_encoder_sub;
 	ros::Subscriber right_encoder_sub;
+
+	std_msgs::Float32MultiArray motor_cmd;
 
 	ros::ServiceClient client;
 	// rospy_tutorials::Floats joints_pub;

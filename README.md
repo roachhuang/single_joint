@@ -7,8 +7,10 @@
       to understand rates and queue size in each node to see if they are properly set.
       tick_meter param in 2 file - pid_velocity and diff_tf. make the param in rosparm
       fix serial_node wrong checksum issue
+      @replace rospy_tutorial/Floats.h with std_msgs/Float32MultiArray 
+      refer to this link to reform ros controller interface - e.g., 
+      https://medium.com/@slaterobotics/how-to-implement-ros-control-on-a-custom-robot-748b52751f2e
 
-    
     mega 2560 int pins: 2, 3, 21, 20, 19, 18 (INT0~5)
 
     pid for uno: lwheel: 80, 0.007, 0.0

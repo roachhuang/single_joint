@@ -58,7 +58,9 @@ void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
 bool MyRobot::init(ros::NodeHandle& nh)
 {
 	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
-	motor_cmd_pub = nh.advertise<rospy_tutorials::Floats>("motor_cmd", 10);
+	// motor_cmd_pub = nh.advertise<rospy_tutorials::Floats>("motor_cmd", 10);
+	motor_cmd_pub = nh.advertise<std_msgs::Float32MultiArray>("motor_cmd", 10);
+
 	// vr_pub = nh.advertise<std_msgs::Float32>("/vr", 10);
 	client = nh.serviceClient<diff_drive::joint_state>("/read_joint_state");
 
@@ -72,7 +74,7 @@ bool MyRobot::init(ros::NodeHandle& nh)
 float MyRobot::mapFloat(float x, float in_min, float in_max, float out_min, float out_max){
 	return (x-in_min)*(out_max-out_min) / (in_max - in_min) + out_min;
 }	
-
+/*
 double MyRobot::ticksToRad(const int32_t& ticks)
 {
 	// Convert number of encoder ticks to angle in radians
@@ -83,7 +85,7 @@ double MyRobot::ticksToRad(const int32_t& ticks)
 	// ROS_DEBUG_STREAM_THROTTLE(1, ticks << " ticks correspond to an angle of " << angle);
 	return degree * M_PI/180;
 }
-
+*/
 void MyRobot::read(ros::Time time, ros::Duration period) {
 	/*
 	ros::Duration elapsed_time = period;
@@ -125,7 +127,8 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 void MyRobot::write(ros::Time time, ros::Duration period) {
 	//std_msgs::Float32 vr;
 	//std_msgs::Float32 vl;
-	rospy_tutorials::Floats motor_cmd;
+	// rospy_tutorials::Floats motor_cmd;
+	// motor_cmd.resize(num_joints);
 
 	const float in_min= -0.5;	// rad/s
 	const float in_max= 0.5;
