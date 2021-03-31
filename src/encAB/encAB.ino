@@ -5,13 +5,13 @@
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
-#include <TimerOne.h>
+// #include <TimerOne.h>
 
 // #define uno
 #ifdef uno
 // pid 4, 0.007 to begin with
 // left
-#define ENCODER_PINA1 3                       // Quadrature encoder A pin for right wheel  
+#define ENCODER_PINA1 3                       // Quadrature encoder A pin for right wheel
 #define ENA 5 // brown
 #define IN1 6 // red
 #define IN2 7 // orange
@@ -22,7 +22,7 @@
 #define IN4 13  // green
 #define N 20
 // MEGA 2560
-/*  
+/*
  *   JGB37-520
  *   red: motor+
  *   black: encoder power-
@@ -34,7 +34,7 @@
 
 #else
 #define ENCODER_PINA1 2                       // Quadrature encoder A pin
-#define ENCODER_PINB1 5                       // Quadrature encoder B pin 
+#define ENCODER_PINB1 5                       // Quadrature encoder B pin
 #define ENA 6
 #define IN1 7 // left motor
 #define IN2 8
@@ -63,7 +63,9 @@ volatile int32_t right_ticks, left_ticks;
 // void get_motor_cmd_cb(const rospy_tutorials::Floats &cmd_msg) {
 void get_motor_cmd_cb(const std_msgs::Float32MultiArray &cmd_msg) {
   vr = cmd_msg.data[0];
-  vl = cmd_msg.data[1];  
+  vl = cmd_msg.data[1];
+  rpwmOut(vr);
+  lpwmOut(vl);
 }
 
 ros::Subscriber<std_msgs::Float32MultiArray> motor_cmd_sub("motor_cmd", &get_motor_cmd_cb);
@@ -107,8 +109,8 @@ void setup() {
 }
 
 void loop() {
-  rpwmOut(vr);
-  lpwmOut(vl);
+  //rpwmOut(vr);
+  //lpwmOut(vl);
 
   cli();
   int_ticksLeft.data = left_ticks;
@@ -116,8 +118,8 @@ void loop() {
   sei();
 
   left_ticks_pub.publish(&int_ticksLeft);
+  nh.spinOnce();
   right_ticks_pub.publish(&int_ticksRight);
-
   nh.spinOnce();
   delay(1); // pub at 100hz (10ms)
 }
@@ -139,7 +141,7 @@ void rEncoder()  {
 #endif
 }
 
-void isrTimerOne(){  
+void isrTimerOne(){
   nh.spinOnce();
   //left_ticks_pub.publish(&int_ticksLeft);
   //right_ticks_pub.publish(&int_ticksRight);
