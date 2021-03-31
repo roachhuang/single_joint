@@ -101,8 +101,8 @@ void setup() {
   pinMode(IN4, OUTPUT);
 
   right_ticks = left_ticks = vl = vr = 0;
-  Timer1.initialize(100000); // 200ms
-  Timer1.attachInterrupt(isrTimerOne);
+  //Timer1.initialize(100000); // 200ms
+  //Timer1.attachInterrupt(isrTimerOne);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), lEncoder, RISING);               // update encoder position
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), rEncoder, RISING);
   // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
