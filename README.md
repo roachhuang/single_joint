@@ -1,4 +1,15 @@
 
+  How to bring up roachbot:
+    From PC:
+      1. edit ./bashrc to set pc as host and pi3 as client
+      2. run roscore from pc
+      3. before connecting pi3 to arudino, rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0 
+      4. rosrun rqt_robot_steering rqt_robot_steering
+      5. rosrun rviz rviz args="-d $(find ros_robotics)/urdf.rviz"
+    From pi3:
+      1. ssh to pi3 - ssh ubuntu@192.168.1.201. pwd: bdM1x5
+      2. roslaunch diff_drive check_velocity_controller.launch       
+
     to do:
       see how to reset cmd[] if no twist cmd 
       figure out if nh_ is really needed
