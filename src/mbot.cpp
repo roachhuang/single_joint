@@ -137,13 +137,14 @@ void MyRobot::write(ros::Time time, ros::Duration period) {
 
 	// effortJointSaturationInterface.enforceLimits(elapsed_time);    		
 	// cmd[0] is registered as joint1
+	motor_cmd.data.resize(2);
 	motor_cmd.data.clear();
 	motor_cmd.data.push_back(cmd[0]);
 	/*left_motor.data = output_left / max_velocity_ * 100.0;
 	right_motor.data = output_right / max_velocity_ * 100.0;		
 	*/
 	// left motor
-	motor_cmd.data.push_back(cmd[1]);
+	motor_cmd.data.push_back(cmd[1]);	
 
 	// ROS_INFO("PWM Cmd: [right: %f \t left: %f]", cmd[0], cmd[1]);
 
