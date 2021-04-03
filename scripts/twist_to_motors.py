@@ -72,7 +72,7 @@ class TwistToMotors():
     
         # dx = (l + r) / 2
         # dr = (r - l) / w
-            
+        # this equations is for m/s, not rad/s    
         self.right = 1.0 * self.dx + self.dr * self.w / 2 
         self.left = 1.0 * self.dx - self.dr * self.w / 2
         # rospy.loginfo("publishing: (%d, %d)", left, right) 
