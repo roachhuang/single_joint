@@ -28,7 +28,8 @@ single_joint_actuator:
       # these PID coffections are tunned and perfectly work btw 0.3 rad/s to 9 rad/s
       #pid: {p: 1.1, i: 0.00162, d: 0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
       pid: {p: 200, i: 0.1, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
-
+      # 300, 0.05 also work
+      
       #pid: {p: 1.2, i: 1.94, d: 0.5, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
 
     wheel_separation : 0.15

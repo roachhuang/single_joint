@@ -55,6 +55,7 @@ void MyRobot::rwheel_cb(const std_msgs::Int32& msg) {
 	encoder_ticks[0] = msg.data;
 	// ROS_DEBUG_STREAM_THROTTLE(1, "Left encoder ticks: " << msg.data);
 }
+
 bool MyRobot::init(ros::NodeHandle& nh)
 {
 	// pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);

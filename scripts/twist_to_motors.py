@@ -41,8 +41,7 @@ class TwistToMotors():
     
         self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float64,queue_size=10)
         self.pub_rmotor = rospy.Publisher('rwheel_vtarget', Float64,queue_size=10)
-        rospy.Subscriber('cmd_vel', Twist, self.twistCallback)
-    
+        rospy.Subscriber('cmd_vel', Twist, self.twistCallback)    
     
         self.rate = rospy.get_param("~rate", 50)
         self.timeout_ticks = rospy.get_param("~timeout_ticks", 2)

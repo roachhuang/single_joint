@@ -1,5 +1,4 @@
 
-
 #include <ros.h>
 // #include <rospy_tutorials/Floats.h>
 #include <std_msgs/Float32MultiArray.h>
@@ -49,7 +48,9 @@
 
 // ticks per revolution, this has to be tested by manually turn the motor 360 degree to get tick number.
 
-ros::NodeHandle nh;
+//#include <ArduinoHardware.h>
+ros::NodeHandle_<ArduinoHardware, 2,2, 128, 128> nh;
+
 // pwm cmd
 // int32_t vl, vr;
 float vr, vl;
@@ -101,8 +102,8 @@ void setup() {
   pinMode(IN4, OUTPUT);
 
   right_ticks = left_ticks = vl = vr = 0;
-  //Timer1.initialize(100000); // 200ms
-  //Timer1.attachInterrupt(isrTimerOne);
+  // Timer1.initialize(10000); // 200ms
+  // Timer1.attachInterrupt(isrTimerOne);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA1), lEncoder, RISING);               // update encoder position
   attachInterrupt(digitalPinToInterrupt(ENCODER_PINA2), rEncoder, RISING);
   // TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
@@ -112,16 +113,17 @@ void loop() {
   //rpwmOut(vr);
   //lpwmOut(vl);
 
-  cli();
+  // cli();
   int_ticksLeft.data = left_ticks;
   int_ticksRight.data = right_ticks;
-  sei();
+  // sei();
 
   left_ticks_pub.publish(&int_ticksLeft);
   nh.spinOnce();
   right_ticks_pub.publish(&int_ticksRight);
   nh.spinOnce();
-  delay(1); // pub at 100hz (10ms)
+  // cannot higher than 3 in my experiment, otherwise pid won't work 
+  delay(3); // pub at 100hz (10ms)
 }
 
 void lEncoder()  {
@@ -141,11 +143,13 @@ void rEncoder()  {
 #endif
 }
 
+/*
 void isrTimerOne(){
   nh.spinOnce();
   //left_ticks_pub.publish(&int_ticksLeft);
   //right_ticks_pub.publish(&int_ticksRight);
 }
+*/
 
 void lpwmOut(float out) {
   // drive motor CW
