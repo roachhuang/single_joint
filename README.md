@@ -1,5 +1,8 @@
 
   How to bring up roachbot:
+    for some reason launchpad_nod has to run before bringup.launch
+    arudino:
+      note: copy messenger.h to libraries folder      
     From PC:
       1. edit ./bashrc to set pc as host and pi3 as client
       2. run roscore from pc
@@ -21,6 +24,7 @@
       @replace rospy_tutorial/Floats.h with std_msgs/Float32MultiArray 
       refer to this link to reform ros controller interface - e.g., 
       https://medium.com/@slaterobotics/how-to-implement-ros-control-on-a-custom-robot-748b52751f2e
+      orgazine folder for project. e.g., seperate robot_description to a diff pkg 
 
     mega 2560 int pins: 2, 3, 21, 20, 19, 18 (INT0~5)
 
