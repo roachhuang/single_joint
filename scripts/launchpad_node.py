@@ -126,8 +126,8 @@ class Launchpad_Class(object):
 
 	def _Update_Motor_Cmd(self, motor_cmd):
 
-		self._vl = motor_cmd.data[0]
-		self._vr = motor_cmd.data[1]
+		self._vr = motor_cmd.data[0]	# to do: remember idx 0 is right wheel
+		self._vl = motor_cmd.data[1]
 		rospy.loginfo(self._vl)
 
 		speed_message = 's %f %f\r' %(self._vl, self._vr)
@@ -152,15 +152,12 @@ class Launchpad_Class(object):
 		self._Counter = self._Counter + 1
 		self._SerialPublisher.publish(String(str(self._Counter) + ", in:  " + line))
 
-
 		if(len(line) > 0):
-
 			lineParts = line.split('\t')
 			try:
 				if(lineParts[0] == 'e'):
 					self._left_encoder_value = long(lineParts[1])
 					self._right_encoder_value = long(lineParts[2])
-
 
 #######################################################################################################################
 
@@ -177,10 +174,8 @@ class Launchpad_Class(object):
 
 #######################################################################################################################
 
-
 				if(lineParts[0] == 'u'):
 					self._ultrasonic_value = float(lineParts[1])
-
 
 #######################################################################################################################
 					self._Ultrasonic_Value.publish(self._ultrasonic_value)
@@ -193,7 +188,6 @@ class Launchpad_Class(object):
 					self._qz = float(lineParts[3])
 					self._qw = float(lineParts[4])
 
-
 #######################################################################################################################
 					self._qx_.publish(self._qx)
 					self._qy_.publish(self._qy)
@@ -201,9 +195,6 @@ class Launchpad_Class(object):
 					self._qw_.publish(self._qw)
 
 #######################################################################################################################
-
-
-
 
 					imu_msg = Imu()
 					h = Header()
@@ -223,27 +214,19 @@ class Launchpad_Class(object):
 					imu_msg.orientation.w = self._qw
 
 					self.imu_pub.publish(imu_msg)
-
-
-
-				
+			
 			except:
 				rospy.logwarn("Error in Sensor values")
 				rospy.logwarn(lineParts)
 				pass
 			
-
-
 #######################################################################################################################
-
 
 	def _WriteSerial(self, message):
 		self._SerialPublisher.publish(String(str(self._Counter) + ", out: " + message))
 		self._SerialDataGateway.Write(message)
 
 #######################################################################################################################
-
-
 	def Start(self):
 		rospy.logdebug("Starting")
 		self._SerialDataGateway.Start()
@@ -254,18 +237,12 @@ class Launchpad_Class(object):
 		rospy.logdebug("Stopping")
 		self._SerialDataGateway.Stop()
 		
-
-		
 #######################################################################################################################
 
-	
 	def Subscribe_Speed(self):
 		a = 1
 #		print "Subscribe speed"
-
 #######################################################################################################################
-
-
 	def Reset_Launchpad(self):
 		print "Reset"
 		reset = 'r\r'
@@ -273,25 +250,20 @@ class Launchpad_Class(object):
 		time.sleep(1)
 		self._WriteSerial(reset)
 		time.sleep(2)
-
-
 #######################################################################################################################
 
 	def Send_Speed(self):
 #		print "Set speed"
 		a = 3
 
-
 if __name__ =='__main__':
 	rospy.init_node('launchpad_ros',anonymous=True)
 	launchpad = Launchpad_Class()
-	try:
-		
+	try:		
 		launchpad.Start()	
 		rospy.spin()
 	except rospy.ROSInterruptException:
 		rospy.logwarn("Error in main function")
-
 
 	launchpad.Reset_Launchpad()
 	launchpad.Stop()
