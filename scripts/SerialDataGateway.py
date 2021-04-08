@@ -18,7 +18,7 @@ class SerialDataGateway(object):
 	Helper class for receiving lines from a serial port
 	'''
 
-	def __init__(self, port="/dev/ttyUSB0", baudrate=115200, lineHandler = _OnLineReceived):
+	def __init__(self, port="/dev/ttyUSB0", baudrate=9600, lineHandler = _OnLineReceived):
 		'''
 		Initializes the receiver class. 
 		port: The serial port to listen to.

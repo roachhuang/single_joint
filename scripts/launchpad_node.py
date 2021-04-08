@@ -60,8 +60,7 @@ class Launchpad_Class(object):
 		rospy.loginfo("Starting with serial port: " + port + ", baud rate: " + str(baudRate))
 		#Initializing SerialDataGateway with port, baudrate and callback function to handle serial data
 		self._SerialDataGateway = SerialDataGateway(port, baudRate,  self._HandleReceivedLine)
-		rospy.loginfo("Started serial communication")
-		
+		rospy.loginfo("Started serial communication")		
 
 #######################################################################################################################
 #Subscribers and Publishers
@@ -89,17 +88,17 @@ class Launchpad_Class(object):
 
 		self.frame_id = '/base_link'
 
-	        self.cal_offset = 0.0
-        	self.orientation = 0.0
-        	self.cal_buffer =[]
-        	self.cal_buffer_length = 1000
-        	self.imu_data = Imu(header=rospy.Header(frame_id="base_link"))
-        	self.imu_data.orientation_covariance = [1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]
-	        self.imu_data.angular_velocity_covariance = [1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]
-        	self.imu_data.linear_acceleration_covariance = [-1,0,0,0,0,0,0,0,0]
-        	self.gyro_measurement_range = 150.0 
-        	self.gyro_scale_correction = 1.35
-        	self.imu_pub = rospy.Publisher('imu/data', Imu,queue_size = 10)
+		self.cal_offset = 0.0
+		self.orientation = 0.0
+		self.cal_buffer =[]
+		self.cal_buffer_length = 1000
+		self.imu_data = Imu(header=rospy.Header(frame_id="base_link"))
+		self.imu_data.orientation_covariance = [1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]
+		self.imu_data.angular_velocity_covariance = [1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]
+		self.imu_data.linear_acceleration_covariance = [-1,0,0,0,0,0,0,0,0]
+		self.gyro_measurement_range = 150.0 
+		self.gyro_scale_correction = 1.35
+		self.imu_pub = rospy.Publisher('imu/data', Imu,queue_size = 10)
 
 		self.deltat = 0
 		self.lastUpdate = 0
@@ -120,6 +119,7 @@ class Launchpad_Class(object):
 		# self._motor_cmd = rospy.Subscriber('motor_cmd', Float32MultiArray, self._Update_Motor_Cmd)
 		self._right_motor_speed = rospy.Subscriber('vr',Float32,self._Update_Right_Speed)
 		self._left_motor_speed = rospy.Subscriber('vl',Float32,self._Update_Left_Speed)
+
 #######################################################################################################################
 	def _Update_Left_Speed(self, left_speed):
 		self._left_wheel_speed_ = left_speed.data
@@ -129,7 +129,7 @@ class Launchpad_Class(object):
 
 	def _Update_Right_Speed(self, right_speed):
 		self._right_wheel_speed_ = right_speed.data
-		rospy.loginfo(right_speed.data)
+		#rospy.loginfo(right_speed.data)
 		speed_message = 's %d %d\r' %(int(self._left_wheel_speed_),int(self._right_wheel_speed_))
 		self._WriteSerial(speed_message)
 		
@@ -145,41 +145,32 @@ class Launchpad_Class(object):
 #######################################################################################################################
 #Calculate orientation from accelerometer and gyrometer
 
-	def _HandleReceivedLine(self,  line):
+	def _HandleReceivedLine(self, line):
 		self._Counter = self._Counter + 1
 		self._SerialPublisher.publish(String(str(self._Counter) + ", in:  " + line))
-
 		if(len(line) > 0):
 			lineParts = line.split('\t')
 			try:
 				if(lineParts[0] == 'e'):
 					self._left_encoder_value = long(lineParts[1])
 					self._right_encoder_value = long(lineParts[2])
-
 #######################################################################################################################
-
 					self._Left_Encoder.publish(self._left_encoder_value)
 					self._Right_Encoder.publish(self._right_encoder_value)
-
 #######################################################################################################################
-				
+			
 				if(lineParts[0] == 'b'):
 					self._battery_value = float(lineParts[1])
-
 #######################################################################################################################
 					self._Battery_Level.publish(self._battery_value)
-
 #######################################################################################################################
-
 				if(lineParts[0] == 'u'):
 					self._ultrasonic_value = float(lineParts[1])
-
 #######################################################################################################################
 					self._Ultrasonic_Value.publish(self._ultrasonic_value)
 #######################################################################################################################
-			
+		
 				if(lineParts[0] == 'i'):
-
 					self._qx = float(lineParts[1])
 					self._qy = float(lineParts[2])
 					self._qz = float(lineParts[3])
@@ -192,26 +183,20 @@ class Launchpad_Class(object):
 					self._qw_.publish(self._qw)
 
 #######################################################################################################################
-
 					imu_msg = Imu()
 					h = Header()
 					h.stamp = rospy.Time.now()
 					h.frame_id = self.frame_id
-
 					imu_msg.header = h
-
 					imu_msg.orientation_covariance = (-1., )*9	
 					imu_msg.angular_velocity_covariance = (-1., )*9
 					imu_msg.linear_acceleration_covariance = (-1., )*9
-
-
 					imu_msg.orientation.x = self._qx
 					imu_msg.orientation.y = self._qy
 					imu_msg.orientation.z = self._qz
 					imu_msg.orientation.w = self._qw
-
 					self.imu_pub.publish(imu_msg)
-			
+		
 			except:
 				rospy.logwarn("Error in Sensor values")
 				rospy.logwarn(lineParts)
