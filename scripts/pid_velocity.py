@@ -54,9 +54,9 @@ class PidVelocity():
         self.prev_encoder = 0
 
         ### get parameters ####
-        self.Kp = rospy.get_param('~Kp', 10)
-        self.Ki = rospy.get_param('~Ki', 10)
-        self.Kd = rospy.get_param('~Kd', 0.001)
+        self.Kp = rospy.get_param('~Kp', 200)
+        self.Ki = rospy.get_param('~Ki', 0.1)
+        self.Kd = rospy.get_param('~Kd', 0)
         self.out_min = rospy.get_param('~out_min', -255)
         self.out_max = rospy.get_param('~out_max', 255)
         self.rate = rospy.get_param('~rate', 30)
@@ -80,8 +80,9 @@ class PidVelocity():
         # subscribers/publishers
         rospy.Subscriber("wheel", Int32, self.wheelCallback)
         rospy.Subscriber("wheel_vtarget", Float64, self.targetCallback)
-        self.pub_motor = rospy.Publisher('wheel_vtarget', Float64, queue_size=10)
-        
+
+        # self.pub_motor = rospy.Publisher('wheel_vtarget', Float64, queue_size=10)       
+        self.pub_motor = rospy.Publisher('motor_cmd',Float32,queue_size=10) 
         self.pub_vel = rospy.Publisher('wheel_vel', Float32, queue_size=10)
 
     #####################################################
@@ -109,8 +110,8 @@ class PidVelocity():
         # only do the loop if we've recently recieved a target velocity message
         while not rospy.is_shutdown() and self.ticks_since_target < self.timeout_ticks:
             self.calcVelocity()
-            #self.doPid()
-            #self.pub_motor.publish(self.motor)
+            self.doPid()
+            self.pub_motor.publish(self.motor)
             self.r.sleep()
             self.ticks_since_target += 1
             if self.ticks_since_target == self.timeout_ticks:

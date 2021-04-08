@@ -113,7 +113,7 @@ void MyRobot::read(ros::Time time, ros::Duration period) {
 
 		pos[1] = joint_read.response.pos2;		
 	    vel[1] = joint_read.response.vel2;
-	    ROS_INFO("right: %.2f, %.2f \t left: %.2f, %.2f",pos[0], vel[0], pos[1], vel[1]);
+	    // ROS_INFO("right: %.2f, %.2f \t left: %.2f, %.2f",pos[0], vel[0], pos[1], vel[1]);
 	
 	// if more than one joint, get values for joint_position_2, joint_velocity_2,......	        
 	}

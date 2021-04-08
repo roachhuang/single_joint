@@ -14,13 +14,20 @@
 		<param name="baud" value="57600"/>
 	</node>	   
   -->
-    <!-- <node name="launchpad_node" pkg="diff_drive" type="launchpad_node.py"/> -->
-    
+
+    <!-- <node name="launchpad_node" pkg="diff_drive" type="launchpad_node.py" output="screen"/> -->
+
     <node name="lpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
         <remap from="wheel" to="lwheel"/>
-        <remap from="wheel_vtarget" to="single_joint_actuator/lwheel/command"/>
+        <!-- <remap from="wheel_vtarget" to="single_joint_actuator/lwheel/command"/> -->
+        <remap from="wheel_vtarget" to="lwheel_vtarget"/>
         <remap from="wheel_vel" to="lwheel_vel"/>
         <remap from="motor_cmd" to="vl"/>
+
+        <rosparam param="Kp">400</rosparam>
+        <rosparam param="Ki">100</rosparam>
+        <rosparam param="Kd">0</rosparam>
+
         <rosparam param="out_min">-253</rosparam>
         <rosparam param="out_max">253</rosparam>
         <rosparam param="rate">30</rosparam>
@@ -29,33 +36,52 @@
     </node>
     <node name="rpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
         <remap from="wheel" to="rwheel"/>
-        <remap from="wheel_vtarget" to="single_joint_actuator/rwheel/command"/>
+        <!-- <remap from="wheel_vtarget" to="single_joint_actuator/rwheel/command"/> -->
+        <remap from="wheel_vtarget" to="rwheel_vtarget"/>
         <remap from="wheel_vel" to="rwheel_vel"/>
         <remap from="motor_cmd" to="vr"/>
+
+        <rosparam param="Kp">400</rosparam>
+        <rosparam param="Ki">100</rosparam>
+        <rosparam param="Kd">0</rosparam>
+
         <rosparam param="out_min">-253</rosparam>
         <rosparam param="out_max">253</rosparam>
         <rosparam param="rate">30</rosparam>
         <rosparam param="timeout_ticks">4</rosparam>
         <rosparam param="rolling_pts">5</rosparam>
     </node>
+
+    <!--
     <node name="joint_vel_service" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/>
+    -->
+
     <node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen">
+    <!--
         <remap from="rwheel_vtarget" to="/single_joint_actuator/rwheel/command"/>
         <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>
+    -->
     </node>
+    <!--
     <node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
+    -->
+    <!--
     <node name="diff_tf" pkg="diff_drive" type="diff_tf.py" output="screen">
         <rosparam param="base_frame_id">base_link</rosparam>
         <rosparam param="odom_frame_id">odom</rosparam>
     </node>
+    -->
+
     <group>
         <rosparam file="$(find diff_drive)/config/controllers.yaml" command="load"/>
+        <!--
         <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
 		  args="
         single_joint_actuator/joint_state_controller
         single_joint_actuator/rwheel
 			  single_joint_actuator/lwheel
         "/>
+        -->
     </group>
 </launch>
 <!--

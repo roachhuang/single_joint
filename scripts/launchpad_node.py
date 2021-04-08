@@ -112,36 +112,33 @@ class Launchpad_Class(object):
 
 		self.GyroMeasDrift = float(self.pi * ( 2 / 180 ))
 		self.zeta = float(math.sqrt(3 / 4) * self.GyroMeasDrift)
-
-
 		self.beta = math.sqrt(3 / 4) * self.GyroMeasError
 
 		self.q = [1,0,0,0]
 #######################################################################################################################
 #Speed subscriber
-		self._motor_cmd = rospy.Subscriber('motor_cmd', Float32MultiArray, self._Update_Motor_Cmd)
-
-		# self._right_motor_speed = rospy.Subscriber('right_wheel_speed',Float32,self._Update_Right_Speed)
+		# self._motor_cmd = rospy.Subscriber('motor_cmd', Float32MultiArray, self._Update_Motor_Cmd)
+		self._right_motor_speed = rospy.Subscriber('vr',Float32,self._Update_Right_Speed)
+		self._left_motor_speed = rospy.Subscriber('vl',Float32,self._Update_Left_Speed)
 #######################################################################################################################
+	def _Update_Left_Speed(self, left_speed):
+		self._left_wheel_speed_ = left_speed.data
+		rospy.loginfo(left_speed.data)
+		speed_message = 's %d %d\r' %(int(self._left_wheel_speed_),int(self._right_wheel_speed_))
+		self._WriteSerial(speed_message)			
 
+	def _Update_Right_Speed(self, right_speed):
+		self._right_wheel_speed_ = right_speed.data
+		rospy.loginfo(right_speed.data)
+		speed_message = 's %d %d\r' %(int(self._left_wheel_speed_),int(self._right_wheel_speed_))
+		self._WriteSerial(speed_message)
+		
+	'''
 	def _Update_Motor_Cmd(self, motor_cmd):
-
 		self._vr = motor_cmd.data[0]	# to do: remember idx 0 is right wheel
 		self._vl = motor_cmd.data[1]
 		rospy.loginfo(self._vl)
-
 		speed_message = 's %f %f\r' %(self._vl, self._vr)
-
-		self._WriteSerial(speed_message)
-	'''
-	def _Update_Right_Speed(self, right_speed):
-
-		self._right_wheel_speed_ = right_speed.data
-
-		rospy.loginfo(right_speed.data)
-
-		speed_message = 's %d %d\r' %(int(self._left_wheel_speed_),int(self._right_wheel_speed_))
-
 		self._WriteSerial(speed_message)
 	'''
 

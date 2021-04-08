@@ -25,6 +25,10 @@
       refer to this link to reform ros controller interface - e.g., 
       https://medium.com/@slaterobotics/how-to-implement-ros-control-on-a-custom-robot-748b52751f2e
       orgazine folder for project. e.g., seperate robot_description to a diff pkg 
+      figure out the influence of baudrate
+      nodemcu + motor shield
+      arduino uno
+      
 
     mega 2560 int pins: 2, 3, 21, 20, 19, 18 (INT0~5)
 
