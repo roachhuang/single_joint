@@ -123,7 +123,7 @@ class Launchpad_Class(object):
 #######################################################################################################################
 	def _Update_Left_Speed(self, left_speed):
 		self._left_wheel_speed_ = left_speed.data
-		rospy.loginfo(left_speed.data)
+		# rospy.loginfo(left_speed.data)
 		speed_message = 's %d %d\r' %(int(self._left_wheel_speed_),int(self._right_wheel_speed_))
 		self._WriteSerial(speed_message)			
 
