@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "std_msgs/Float32.h"
+// #include "std_msgs/Float32.h"
 #include "std_msgs/Float64.h"
 
 #include <tf/transform_broadcaster.h>
@@ -114,8 +114,8 @@ void TwistToMotors::spinOnce()
 
     //	ROS_INFO_STREAM("right = " << right << "\t" << "left = " << left << "dr"<< dr);
 
-    std_msgs::Float32 left_;
-    std_msgs::Float32 right_;
+    std_msgs::Float64 left_;
+    std_msgs::Float64 right_;
 
     left_.data = left;
     right_.data = right;
