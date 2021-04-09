@@ -14,14 +14,17 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   std_srvs
+  nav_msgs
+  geometry_msgs
   message_generation
   message_runtime
   actionlib_msgs
   actionlib
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -154,6 +157,8 @@ include_directories(
 #add_dependencies(test_service diff_drive_gencpp)
 
 add_executable(mbot src/mbot.cpp)
+add_executable(twist_to_motors src/twist_to_motors.cpp)
+add_executable(diff_tf src/diff_tf.cpp)
 #add_executable(single_joint_hardware_interface src/single_joint_hardware_interface.cpp)
 #add_executable(test_service src/test_service.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
@@ -166,6 +171,8 @@ add_executable(mbot src/mbot.cpp)
 ## )
 #target_link_libraries(single_joint_hardware_interface ${catkin_LIBRARIES})
 target_link_libraries(mbot ${catkin_LIBRARIES})
+target_link_libraries(twist_to_motors ${catkin_LIBRARIES})
+target_link_libraries(diff_tf ${catkin_LIBRARIES})
 
 #############
 ## Install ##
