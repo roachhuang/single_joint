@@ -56,7 +56,7 @@
     <node name="joint_vel_service" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/>
     -->
 
-    <node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen">
+    <node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors" output="screen">
     <!--
         <remap from="rwheel_vtarget" to="/single_joint_actuator/rwheel/command"/>
         <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>
