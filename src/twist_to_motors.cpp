@@ -2,9 +2,9 @@
 // #include "std_msgs/Float32.h"
 #include "std_msgs/Float64.h"
 
-#include <tf/transform_broadcaster.h>
+// #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <math.h>
+// #include <math.h>
 
 class TwistToMotors
 {
@@ -60,7 +60,7 @@ void TwistToMotors::init_variables()
 
     dx = dy = dr = 0;
 
-    w = 0.2;
+    w = 0.15;
     rate = 50;
     timeout_ticks = 2;
 }
