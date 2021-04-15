@@ -1,0 +1,14 @@
+digraph G {
+node [shape=box];
+"base_link" [label="base_link"];
+"imu_link" [label="imu_link"];
+"right_wheel" [label="right_wheel"];
+"left_wheel" [label="left_wheel"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_link" -> "imu_joint" [label="xyz: 0 0 0.036 \nrpy: 0 -0 0"]
+"imu_joint" -> "imu_link"
+"base_link" -> "joint1" [label="xyz: 0 -0.08 0 \nrpy: 0 -0 0"]
+"joint1" -> "right_wheel"
+"base_link" -> "joint2" [label="xyz: 0 0.08 0 \nrpy: 0 -0 0"]
+"joint2" -> "left_wheel"
+}
