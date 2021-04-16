@@ -22,7 +22,7 @@
         <remap from="wheel_vel" to="lwheel_vel"/>
         <remap from="motor_cmd" to="vl"/>
         <rosparam param="Kp">400</rosparam>
-        <rosparam param="Ki">100</rosparam>
+        <rosparam param="Ki">90</rosparam>
         <rosparam param="Kd">0</rosparam>
         <rosparam param="out_min">-253</rosparam>
         <rosparam param="out_max">253</rosparam>
@@ -37,7 +37,7 @@
         <remap from="wheel_vel" to="rwheel_vel"/>
         <remap from="motor_cmd" to="vr"/>
         <rosparam param="Kp">400</rosparam>
-        <rosparam param="Ki">100</rosparam>
+        <rosparam param="Ki">90</rosparam>
         <rosparam param="Kd">0</rosparam>
         <rosparam param="out_min">-253</rosparam>
         <rosparam param="out_max">253</rosparam>
@@ -45,34 +45,39 @@
         <rosparam param="timeout_ticks">4</rosparam>
         <rosparam param="rolling_pts">5</rosparam>
     </node>
-    <!--
+
+    <!-- sub wheel_vel topics from pid_vel for a node to pub joint_state topic for rviz to show the robot
     <node name="joint_vel_service" pkg="diff_drive" type="joints_receive_from_pid_vel.py" output="screen"/>
     -->
+    
     <node name="twst_to_motors" pkg="diff_drive" type="twist_to_motors.py" output="screen">
         <!--
         <remap from="rwheel_vtarget" to="/single_joint_actuator/rwheel/command"/>
         <remap from="lwheel_vtarget" to="/single_joint_actuator/lwheel/command"/>
-    -->
+        -->
     </node>
-    <!--
+
+    <!-- load h/w interface
     <node name="robot_hardware_interface" pkg="diff_drive" type="mbot" output="screen"/>
     -->
-    <!--
-    <node name="diff_tf" pkg="diff_drive" type="diff_tf.py" output="screen">
+    
+    <!-- odom -->
+    <node name="diff_tf" pkg="diff_drive" type="diff_tf" output="screen">
         <rosparam param="base_frame_id">base_link</rosparam>
         <rosparam param="odom_frame_id">odom</rosparam>
     </node>
-    -->
-    <!--
+    
+    <!-- load controller manager
         <group>    
         <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
-		  args="
-        single_joint_actuator/joint_state_controller
-        single_joint_actuator/rwheel
-			  single_joint_actuator/lwheel
+		      args="
+          single_joint_actuator/joint_state_controller
+          single_joint_actuator/rwheel
+			    single_joint_actuator/lwheel
         "/>
         </group>
-        -->
+    -->
+
 </launch>
 <!--
    note that we cannot run position controller and velocity controller at the same time, so we create two launch files.

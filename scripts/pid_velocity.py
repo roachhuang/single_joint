@@ -88,6 +88,7 @@ class PidVelocity():
 
         # self.pub_motor = rospy.Publisher('wheel_vtarget', Float64, queue_size=10)
         self.pub_motor = rospy.Publisher('motor_cmd', Float32, queue_size=10)
+        # this is for tunning pid 
         self.pub_vel = rospy.Publisher('wheel_vel', Float32, queue_size=10)
 
     #####################################################
@@ -150,7 +151,6 @@ class PidVelocity():
                     # as a velocity
                     self.appendVel(cur_vel)
                     self.calcRollingVel()
-
         else:
             # we received a new wheel value
             cur_vel = (self.wheel_latest - self.wheel_prev) / self.dt

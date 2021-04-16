@@ -267,7 +267,8 @@ void Odometry_calc::update()
         geometry_msgs::TransformStamped odom_trans;
         odom_trans.header.stamp = now;
         odom_trans.header.frame_id = "odom";
-        odom_trans.child_frame_id = "base_footprint";
+        odom_trans.child_frame_id = "base_link";
+        // odom_trans.child_frame_id = "base_footprint";
 
         odom_trans.transform.translation.x = x_final;
         odom_trans.transform.translation.y = y_final;
