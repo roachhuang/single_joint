@@ -52,3 +52,7 @@ rqt_gui rq
  history <number>
  # run previous cmd again
  !<number>
+
+wheel_circumference = pi * d
+wheel_rotations_per_meter = 1 / (pi * d)
+ticks_per_meter = wheel_rotations_per_meter * ticks_per_rev
