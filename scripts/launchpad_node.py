@@ -44,8 +44,8 @@ class Launchpad_Class(object):
 		self._qz = 0
 		self._qw = 0
 
-		self._vl_ = 0
-		self._vr = 0
+		self._left_wheel_speed_ = 0
+		self._right_wheel_speed_ = 0
 
 		self._LastUpdate_Microsec = 0
 		self._Second_Since_Last_Update = 0
@@ -54,7 +54,7 @@ class Launchpad_Class(object):
 #######################################################################################################################
 		#Get serial port and baud rate of Tiva C Launchpad
 		port = rospy.get_param("~port", "/dev/ttyUSB0")
-		baudRate = int(rospy.get_param("~baudRate", 115200))
+		baudRate = int(rospy.get_param("~baudRate", 19200))
 
 #######################################################################################################################
 		rospy.loginfo("Starting with serial port: " + port + ", baud rate: " + str(baudRate))

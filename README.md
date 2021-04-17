@@ -73,3 +73,5 @@ rqt_gui rq
  history <number>
  # run previous cmd again
  !<number>
+
+ distance travelled by each wheel: delta X = 2*pi*R*ticks/N

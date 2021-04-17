@@ -11,13 +11,15 @@
     rosrun teleop_twist_keyboard teleop_twist_keyboard.py
     roslaunch robotican_lizi lizi.launch gazebo:=true
     -->
+
     <!-- convert joint states to TF transforms for rviz, etc (we use odom.py instead) -->
-    
+    <!--
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-       <!-- <respawn="false" output="screen"> -->
+       ! <respawn="false" output="screen"> 
        <param name="publish_frequency" type="double" value="5.0" />
     </node>
-    
+    -->
+
     <!--
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
     <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>

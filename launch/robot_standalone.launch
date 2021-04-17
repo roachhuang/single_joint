@@ -1,0 +1,60 @@
+<launch>
+    <!-- change this next line to include the launch file for your robot's hardware drivers: -->
+    <arg name="simulation" default="$(optenv TURTLEBOT_SIMULATION false)"/>
+    <param name="/use_sim_time" value="$(arg simulation)"/>
+
+    <!--  <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find arlobot_description)/urdf/common.urdf.xacro'" /> -->
+    <!--
+  <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find chefbot_description)/urdf/chefbot_base.xacro'" /> 
+  <param name="robot_description" command="$(arg urdf_file)" />
+
+-->
+    <include file="$(find diff_drive)/launch/view_robot.launch" />
+
+    <!-- important generally, but specifically utilised by the current app manager -->
+    <param name="robot/name" value="$(optenv ROBOT turtlebot)"/>
+    <param name="robot/type" value="turtlebot"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="5.0" />
+    </node>
+
+    <rosparam param="base_width">0.15</rosparam>
+    <rosparam param="ticks_meter">3665</rosparam>
+
+    <node name="launchpad_node" pkg="diff_drive" type="launchpad_node.py">
+        <rosparam file="$(find diff_drive)/param/board_config.yaml" command="load" />
+    </node>
+
+    <node name="lpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
+        <remap from="wheel" to="lwheel"/>
+        <remap from="motor_cmd" to="vl"/>
+        <remap from="wheel_vtarget" to="lwheel_vtarget"/>
+        <remap from="wheel_vel" to="lwheel_vel"/>
+        <rosparam param="Kp">0</rosparam>
+        <rosparam param="Ki">0</rosparam>
+        <rosparam param="Kd">0</rosparam>
+        <rosparam param="out_min">-255</rosparam>
+        <rosparam param="out_max">255</rosparam>
+        <rosparam param="rate">30</rosparam>
+        <rosparam param="timeout_ticks">4</rosparam>
+        <rosparam param="rolling_pts">5</rosparam>
+    </node>
+    <node name="rpid_velocity" pkg="diff_drive" type="pid_velocity.py" output="screen">
+        <remap from="wheel" to="rwheel"/>
+        <remap from="motor_cmd" to="vr"/>
+        <remap from="wheel_vtarget" to="rwheel_vtarget"/>
+        <remap from="wheel_vel" to="rwheel_vel"/>
+        <rosparam param="Kp">0</rosparam>
+        <rosparam param="Ki">0</rosparam>
+        <rosparam param="Kd">0</rosparam>
+        <rosparam param="out_min">-255</rosparam>
+        <rosparam param="out_max">255</rosparam>
+        <rosparam param="rate">30</rosparam>
+        <rosparam param="timeout_ticks">4</rosparam>
+        <rosparam param="rolling_pts">5</rosparam>
+    </node>
+
+    <node pkg="diff_drive" type="twist_to_motors.py" name="twist_to_motors" output="screen"/>
+    <node pkg="diff_drive" type="diff_tf.py" name="diff_tf" output="screen"/>
+</launch>
